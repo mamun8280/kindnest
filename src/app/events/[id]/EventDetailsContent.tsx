@@ -13,7 +13,6 @@ import {
   Tag,
   Loader2,
   HeartHandshake,
-  Trash2,
   Pencil,
 } from "lucide-react";
 
@@ -24,6 +23,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import EditEventPage, {
   type EventData,
 } from "@/components/events/EditEventsPage";
+
+import DeleteEventsPage from "@/components/events/DeleteEventsPage";
 
 const EventDetailsContent = () => {
   const params = useParams();
@@ -37,18 +38,9 @@ const EventDetailsContent = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
 
-  // Authentication Check
+  // Fetch Event (Public)
   useEffect(() => {
-    if (!isPending && !session) {
-      router.replace(
-        `/login?callbackURL=${encodeURIComponent(`/events/${id}`)}`
-      );
-    }
-  }, [isPending, session, router, id]);
-
-  // Fetch Event
-  useEffect(() => {
-    if (isPending || !session || !id) return;
+    if (isPending || !id) return;
 
     let cancelled = false;
 
@@ -92,10 +84,10 @@ const EventDetailsContent = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, session, isPending]);
+  }, [id, isPending]);
 
   // Loading
-  if (isPending || !session || loading) {
+  if (isPending || loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f8faf7]">
         <div className="flex items-center gap-2 text-[#34765a]">
@@ -121,17 +113,19 @@ const EventDetailsContent = () => {
         </p>
 
         <Button
-          onClick={() => router.push("/manage-events")}
+          onClick={() => router.push("/upcoming-events")}
           className="mt-5 bg-[#34765a] hover:bg-[#285c45]"
         >
-          Back to Manage Events
+          Back to Upcoming Events
         </Button>
       </main>
     );
   }
 
   // Event Owner Check
-  const isOwner = event.creatorEmail === session.user.email;
+  const isOwner =
+    !!session?.user?.email &&
+    event.creatorEmail === session.user.email;
 
   // Format Date
   const formattedDate = new Date(
@@ -147,11 +141,11 @@ const EventDetailsContent = () => {
       <div className="mx-auto max-w-4xl">
 
         <Link
-          href="/manage-events"
+          href="/upcoming-events"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#718077] transition hover:text-[#34765a]"
         >
           <ArrowLeft size={17} />
-          Back to Manage Events
+          Back to Upcoming Events
         </Link>
 
         <Card className="overflow-hidden rounded-3xl border border-[#e5ece6] bg-white shadow-sm">
@@ -168,27 +162,28 @@ const EventDetailsContent = () => {
                 Edit
               </Button>
 
-              <Button
-                variant="destructive"
-                className="rounded-xl"
-              >
-                <Trash2 size={16} className="mr-2" />
-                Delete
-              </Button>
+              <DeleteEventsPage id={event._id} />
 
             </div>
           )}
 
           {/* Event Image */}
           <div className="relative h-64 w-full sm:h-96">
-            <Image
-              src={event.imageUrl}
-              alt={event.eventTitle}
-              fill
-              priority
-              sizes="(max-width: 640px) 100vw, 896px"
-              className="object-cover"
-            />
+            {event.imageUrl ? (
+              <Image
+                src={event.imageUrl}
+                alt={event.eventTitle}
+                fill
+                priority
+                unoptimized
+                sizes="(max-width: 640px) 100vw, 896px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-[#edf3ed]">
+                <HeartHandshake className="h-16 w-16 text-[#b8c9bc]" />
+              </div>
+            )}
 
             <div className="absolute bottom-4 left-4">
               <span className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#34765a] shadow-sm">
@@ -270,7 +265,7 @@ const EventDetailsContent = () => {
             <div className="mt-7 flex flex-wrap gap-3">
               <Button
                 variant="outline"
-                onClick={() => router.push("/manage-events")}
+                onClick={() => router.push("/upcoming-events")}
                 className="rounded-xl border-[#dce8de] text-[#34765a] hover:bg-[#eaf3ec]"
               >
                 <ArrowLeft size={16} className="mr-2" />

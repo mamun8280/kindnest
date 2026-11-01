@@ -35,7 +35,6 @@ const eventTypes = [
   "Education",
 ];
 
-// Event Data Type
 export interface EventData {
   _id: string;
   eventTitle: string;
@@ -48,7 +47,6 @@ export interface EventData {
   createdAt: string;
 }
 
-// Form Data Type
 type EventFormData = Pick<
   EventData,
   | "eventTitle"
@@ -84,6 +82,7 @@ const EditEventPage = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState<EventFormData>(
     getInitialFormData
   );
@@ -149,6 +148,7 @@ const EditEventPage = ({
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(formData),
         }
       );

@@ -110,10 +110,9 @@ const CreateEventPage = () => {
       return;
     }
 
+    // Backend will add creatorEmail and createdAt
     const eventData = {
       ...formData,
-      creatorEmail: session.user.email,
-      createdAt: new Date().toISOString(),
     };
 
     try {
@@ -121,6 +120,7 @@ const CreateEventPage = () => {
 
       const response = await fetch("http://localhost:8000/create-event", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -133,21 +133,10 @@ const CreateEventPage = () => {
         throw new Error(result.message || "Failed to create event");
       }
 
-      // Success Toast
       toast.success("Event published successfully!");
 
-      // Reset Form
-      setFormData({
-        eventTitle: "",
-        eventType: "",
-        eventDate: "",
-        location: "",
-        imageUrl: "",
-        description: "",
-      });
-
-      // Stay on Create Event Page
-      router.refresh();
+      // Redirect to Manage Events
+      router.push("/manage-events");
 
     } catch (error) {
       console.error("Create Event Error:", error);

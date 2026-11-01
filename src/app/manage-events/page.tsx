@@ -55,9 +55,11 @@ export default function ManageEventsPage() {
         setLoading(true);
 
         const response = await fetch(
-          `http://localhost:8000/ManageEvents?email=${encodeURIComponent(
-            session.user.email
-          )}`
+          "http://localhost:8000/ManageEvents",
+          {
+            method: "GET",
+            credentials: "include",
+          }
         );
 
         if (!response.ok) {
