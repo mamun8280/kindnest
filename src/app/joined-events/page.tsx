@@ -5,7 +5,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, MapPin, ArrowRight, Loader2, HeartHandshake } from "lucide-react";
+import {
+  CalendarDays,
+  MapPin,
+  ArrowRight,
+  Loader2,
+  HeartHandshake,
+  LogOut,
+} from "lucide-react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
 interface EventData {
@@ -27,6 +35,7 @@ export default function JoinedEventsPage() {
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [leavingId, setLeavingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isPending) return;
@@ -93,6 +102,56 @@ export default function JoinedEventsPage() {
     };
   }, [session, isPending, router]);
 
+  // Leave Event Function
+  const handleLeaveEvent = async (eventId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to leave this event?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setLeavingId(eventId);
+
+      const response = await fetch(
+        `http://localhost:8000/leave-event/${eventId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const contentType = response.headers.get("content-type");
+
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server JSON response dicche na.");
+      }
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Failed to leave event."
+        );
+      }
+
+      // Remove only this event from the Joined Events list
+      setEvents((previousEvents) =>
+        previousEvents.filter((event) => event._id !== eventId)
+      );
+
+      toast.success("You have successfully left this event!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong."
+      );
+    } finally {
+      setLeavingId(null);
+    }
+  };
+
   if (isPending || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -107,7 +166,9 @@ export default function JoinedEventsPage() {
         <h2 className="text-xl font-bold text-red-600">
           Failed to load Joined Events
         </h2>
+
         <p className="mt-3 text-gray-600">{error}</p>
+
         <button
           onClick={() => window.location.reload()}
           className="mt-5 rounded-lg bg-[#34765a] px-6 py-3 text-white hover:bg-[#285c45]"
@@ -206,6 +267,7 @@ export default function JoinedEventsPage() {
                           size={17}
                           className="shrink-0 text-[#34765a]"
                         />
+
                         {new Date(event.eventDate).toLocaleDateString(
                           "en-GB",
                           {
@@ -221,6 +283,7 @@ export default function JoinedEventsPage() {
                           size={17}
                           className="shrink-0 text-[#34765a]"
                         />
+
                         {event.location}
                       </p>
                     </div>
@@ -232,6 +295,24 @@ export default function JoinedEventsPage() {
                       View Details
                       <ArrowRight size={18} />
                     </Link>
+
+                    <button
+                      onClick={() => handleLeaveEvent(event._id)}
+                      disabled={leavingId === event._id}
+                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {leavingId === event._id ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Leaving...
+                        </>
+                      ) : (
+                        <>
+                          <LogOut size={18} />
+                          Leave Event
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               ))}

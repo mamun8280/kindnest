@@ -1,7 +1,8 @@
 import Banner from "@/components/Banner";
 import Features from "@/components/Features";
 import Newsletter from "@/components/Newsletter";
-import UpcomingEventsPage from "./upcoming-events/page";
+import RecentUpcomingEvents from "@/components/RecentUpcomingEvents";
+
 
 export default function Home() {
   return (
@@ -9,7 +10,7 @@ export default function Home() {
       <Banner />
 
       <Features />
-      <UpcomingEventsPage/>
+      <RecentUpcomingEvents />
 
       <Newsletter />
     </>

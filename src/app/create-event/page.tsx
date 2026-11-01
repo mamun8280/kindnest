@@ -31,6 +31,15 @@ const eventTypes = [
   "Education",
 ];
 
+const initialFormData = {
+  eventTitle: "",
+  eventType: "",
+  eventDate: "",
+  location: "",
+  imageUrl: "",
+  description: "",
+};
+
 const CreateEventPage = () => {
   const router = useRouter();
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -39,14 +48,7 @@ const CreateEventPage = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
-    eventTitle: "",
-    eventType: "",
-    eventDate: "",
-    location: "",
-    imageUrl: "",
-    description: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   // Protect this page: login required
   useEffect(() => {
@@ -110,7 +112,6 @@ const CreateEventPage = () => {
       return;
     }
 
-    // Backend will add creatorEmail and createdAt
     const eventData = {
       ...formData,
     };
@@ -127,16 +128,26 @@ const CreateEventPage = () => {
         body: JSON.stringify(eventData),
       });
 
+      const contentType = response.headers.get("content-type");
+
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server JSON response dicche na. Backend check koro.");
+      }
+
       const result = await response.json();
 
       if (!response.ok) {
         throw new Error(result.message || "Failed to create event");
       }
 
+      // Success message
       toast.success("Event published successfully!");
 
-      // Redirect to Manage Events
-      router.push("/manage-events");
+      // Clear all form fields
+      setFormData(initialFormData);
+
+      // Keep the user on the same page
+      // No router.push() here
 
     } catch (error) {
       console.error("Create Event Error:", error);
