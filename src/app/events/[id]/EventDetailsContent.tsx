@@ -38,6 +38,10 @@ const EventDetailsContent = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
 
+  // Join Event States
+  const [hasJoined, setHasJoined] = useState(false);
+  const [joining, setJoining] = useState(false);
+
   // Fetch Event (Public)
   useEffect(() => {
     if (isPending || !id) return;
@@ -86,6 +90,45 @@ const EventDetailsContent = () => {
     };
   }, [id, isPending]);
 
+  // Check whether current user already joined
+  useEffect(() => {
+    if (isPending || !id || !session?.user?.email) return;
+
+    let cancelled = false;
+
+    const checkJoinedStatus = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/joined-events/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.message || "Failed to check joined status"
+          );
+        }
+
+        if (!cancelled) {
+          setHasJoined(result.joined === true);
+        }
+      } catch (error) {
+        console.error("Join Status Error:", error);
+      }
+    };
+
+    checkJoinedStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isPending, session?.user?.email]);
+
   // Loading
   if (isPending || loading) {
     return (
@@ -127,6 +170,55 @@ const EventDetailsContent = () => {
     !!session?.user?.email &&
     event.creatorEmail === session.user.email;
 
+  // Join Event Handler
+  const handleJoinEvent = async () => {
+    if (!session?.user?.email) {
+      router.push(
+        `/login?callbackURL=${encodeURIComponent(`/events/${id}`)}`
+      );
+      return;
+    }
+
+    if (hasJoined || joining || isOwner) return;
+
+    try {
+      setJoining(true);
+
+      const response = await fetch(
+        `http://localhost:8000/join-event/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setHasJoined(true);
+          toast.info("You have already joined this event.");
+          return;
+        }
+
+        throw new Error(result.message || "Failed to join event");
+      }
+
+      setHasJoined(true);
+      toast.success("You have successfully joined this event!");
+    } catch (error) {
+      console.error("Join Event Error:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong!"
+      );
+    } finally {
+      setJoining(false);
+    }
+  };
+
   // Format Date
   const formattedDate = new Date(
     `${event.eventDate.slice(0, 10)}T00:00:00`
@@ -153,7 +245,6 @@ const EventDetailsContent = () => {
           {/* Edit and Delete Buttons */}
           {isOwner && (
             <div className="flex justify-end gap-3 border-b border-[#e5ece6] bg-white px-6 py-4 sm:px-8">
-
               <Button
                 onClick={() => setEditOpen(true)}
                 className="rounded-xl bg-[#34765a] text-white hover:bg-[#285c45]"
@@ -163,7 +254,6 @@ const EventDetailsContent = () => {
               </Button>
 
               <DeleteEventsPage id={event._id} />
-
             </div>
           )}
 
@@ -261,6 +351,34 @@ const EventDetailsContent = () => {
                 {event.creatorEmail}
               </p>
             </div>
+
+            {/* Join Event Button */}
+            {!isOwner && (
+              <div className="mt-7">
+                <Button
+                  onClick={handleJoinEvent}
+                  disabled={joining || hasJoined}
+                  className="w-full rounded-xl bg-[#34765a] py-6 text-white hover:bg-[#285c45] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                >
+                  {joining ? (
+                    <>
+                      <Loader2 className="mr-2 animate-spin" size={18} />
+                      Joining...
+                    </>
+                  ) : hasJoined ? (
+                    <>
+                      <HeartHandshake className="mr-2" size={18} />
+                      Already Joined
+                    </>
+                  ) : (
+                    <>
+                      <HeartHandshake className="mr-2" size={18} />
+                      Join Event
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Button
