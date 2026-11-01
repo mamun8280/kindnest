@@ -1,12 +1,11 @@
-import Banner from '@/components/Banner';
-import React from 'react';
+import Banner from "@/components/Banner";
+import Features from "@/components/Features";
 
-const HpmepPage = () => {
+export default function Home() {
   return (
-    <div>
-       <Banner />
-    </div>
+    <>
+      <Banner />
+      <Features />
+    </>
   );
-};
-
-export default HpmepPage;
+}
