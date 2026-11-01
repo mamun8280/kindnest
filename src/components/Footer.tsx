@@ -197,7 +197,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 border-t border-emerald-200/70 py-7 text-center sm:flex-row sm:text-left">
 
           <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} KindNest. All rights reserved.
+          © 2026 KindNest. All rights reserved.
           </p>
 
           <p className="flex items-center gap-2 text-xs text-gray-500">
