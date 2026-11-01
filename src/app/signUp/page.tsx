@@ -1,7 +1,14 @@
-
 "use client";
 
 import { useState } from "react";
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import {
   Field,
   FieldDescription,
@@ -17,17 +25,17 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
+
 import { Input } from "@/components/ui/input";
-import { authClient } from "../../lib/auth-client";
-import Link from "next/link";
-import React from "react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [password, setPassword] = useState("");
 
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Password Validation
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
   const hasMinLength = password.length >= 6;
@@ -35,44 +43,79 @@ export default function SignUpPage() {
   const passwordValid =
     hasUppercase && hasLowercase && hasMinLength;
 
+  // Email Signup
   const handleEmailSignup = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
-    if (!passwordValid) return;
+    if (!passwordValid) {
+      toast.error("Please enter a valid password!");
+      return;
+    }
+
+    setLoading(true);
 
     const formData = new FormData(e.currentTarget);
 
-    const user = Object.fromEntries(
-      formData.entries()
-    ) as {
-      name: string;
-      email: string;
-      image: string;
-      password: string;
-    };
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const image = formData.get("image") as string;
 
-    const { data, error } = await authClient.signUp.email({
-      ...user,
-    });
+    try {
+      const { data, error } = await authClient.signUp.email({
+        name,
+        email,
+        image,
+        password,
+      });
 
-    if (data) {
-      router.push("/");
+      if (error) {
+        toast.error(error.message || "Registration failed!");
+        return;
+      }
+
+      if (data) {
+        toast.success("Account created successfully!");
+
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Signup Error:", error);
+      toast.error("Something went wrong. Please try again!");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (error) {
-      console.log(error);
+  // Google Signup
+  const handleGoogleSignup = async () => {
+    try {
+      setGoogleLoading(true);
+
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      console.error("Google Signup Error:", error);
+
+      toast.error("Google signup failed!");
+
+      setGoogleLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto my-10">
+    <section className="mx-auto my-10 flex max-w-6xl flex-col gap-6 px-4">
+
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Create an Account
           </CardTitle>
+
           <CardDescription>
             Sign up with your Google account or email
           </CardDescription>
@@ -81,22 +124,32 @@ export default function SignUpPage() {
         <CardContent>
           <form onSubmit={handleEmailSignup}>
             <FieldGroup>
-              <Field>
-                <Button variant="outline" type="button">
-                  Login with Apple
-                </Button>
 
-                <Button variant="outline" type="button">
-                  Login with Google
+              {/* Google Signup */}
+              <Field>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={handleGoogleSignup}
+                  disabled={googleLoading || loading}
+                  className="w-full"
+                >
+                  {googleLoading
+                    ? "Connecting to Google..."
+                    : "Continue with Google"}
                 </Button>
               </Field>
 
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                Or continue with email
               </FieldSeparator>
 
+              {/* Name */}
               <Field>
-                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <FieldLabel htmlFor="name">
+                  Name
+                </FieldLabel>
+
                 <Input
                   id="name"
                   type="text"
@@ -106,19 +159,27 @@ export default function SignUpPage() {
                 />
               </Field>
 
+              {/* Image */}
               <Field>
-                <FieldLabel htmlFor="image">Image URL</FieldLabel>
+                <FieldLabel htmlFor="image">
+                  Profile Image URL
+                </FieldLabel>
+
                 <Input
                   id="image"
                   type="url"
                   name="image"
-                  placeholder="Enter image url"
+                  placeholder="Enter your image URL"
                   required
                 />
               </Field>
 
+              {/* Email */}
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">
+                  Email
+                </FieldLabel>
+
                 <Input
                   id="email"
                   type="email"
@@ -128,6 +189,7 @@ export default function SignUpPage() {
                 />
               </Field>
 
+              {/* Password */}
               <Field>
                 <FieldLabel htmlFor="password">
                   Password
@@ -137,50 +199,66 @@ export default function SignUpPage() {
                   id="password"
                   type="password"
                   name="password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
 
-                <div className="space-y-1 text-sm mt-2">
-                  <p className={cn(
-                    "text-muted-foreground",
-                    hasUppercase && "text-green-600"
-                  )}>
+                {/* Password Rules */}
+                <div className="mt-2 space-y-1 text-sm">
+
+                  <p
+                    className={cn(
+                      "text-muted-foreground",
+                      hasUppercase && "text-green-600"
+                    )}
+                  >
                     {hasUppercase ? "✓" : "○"} At least one uppercase (A-Z)
                   </p>
 
-                  <p className={cn(
-                    "text-muted-foreground",
-                    hasLowercase && "text-green-600"
-                  )}>
+                  <p
+                    className={cn(
+                      "text-muted-foreground",
+                      hasLowercase && "text-green-600"
+                    )}
+                  >
                     {hasLowercase ? "✓" : "○"} At least one lowercase (a-z)
                   </p>
 
-                  <p className={cn(
-                    "text-muted-foreground",
-                    hasMinLength && "text-green-600"
-                  )}>
-                    {hasMinLength ? "✓" : "○"} Minimum 6 characters length
+                  <p
+                    className={cn(
+                      "text-muted-foreground",
+                      hasMinLength && "text-green-600"
+                    )}
+                  >
+                    {hasMinLength ? "✓" : "○"} Minimum 6 characters
                   </p>
+
                 </div>
               </Field>
 
+              {/* Submit */}
               <Field>
                 <Button
                   type="submit"
-                  disabled={!passwordValid}
+                  disabled={!passwordValid || loading || googleLoading}
+                  className="w-full bg-green-800 hover:bg-green-900"
                 >
-                  Sign Up
+                  {loading ? "Creating Account..." : "Sign Up"}
                 </Button>
 
                 <FieldDescription className="text-center">
-                  Have an account?{" "}
-                  <Link href="/login" className="underline">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold text-green-700 underline"
+                  >
                     Login
                   </Link>
                 </FieldDescription>
               </Field>
+
             </FieldGroup>
           </form>
         </CardContent>
@@ -190,6 +268,7 @@ export default function SignUpPage() {
         By clicking continue, you agree to our Terms of Service
         and Privacy Policy.
       </FieldDescription>
-    </div>
+
+    </section>
   );
 }

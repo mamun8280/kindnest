@@ -1,9 +1,10 @@
+import Banner from '@/components/Banner';
 import React from 'react';
 
 const HpmepPage = () => {
   return (
     <div>
-      HpmepPage
+       <Banner />
     </div>
   );
 };

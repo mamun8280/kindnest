@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   Menu,
@@ -155,6 +156,7 @@ function ProfileMenu({
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const router = useRouter();
 
@@ -164,16 +166,31 @@ export default function Navbar() {
 
   const closeMenu = () => setIsOpen(false);
 
+  // Logout Function
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+
     try {
-      await authClient.signOut();
+      setIsLoggingOut(true);
+
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        toast.error("Logout failed!");
+        return;
+      }
 
       closeMenu();
+
+      toast.success("Logged out successfully!");
 
       router.push("/login");
       router.refresh();
     } catch (error) {
       console.error("Logout Error:", error);
+      toast.error("Something went wrong!");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -322,11 +339,12 @@ export default function Navbar() {
 
                 <Button
                   onClick={handleLogout}
+                  disabled={isLoggingOut}
                   variant="ghost"
                   className="justify-start gap-3 px-4 text-red-600 hover:bg-red-50 hover:text-red-600"
                 >
                   <LogOut size={18} />
-                  Logout
+                  {isLoggingOut ? "Logging out..." : "Logout"}
                 </Button>
               </>
             )}
