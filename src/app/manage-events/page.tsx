@@ -65,7 +65,6 @@ export default function ManageEventsPage() {
         }
 
         const data = await response.json();
-
         setEvents(data);
       } catch (error) {
         console.error("Fetch Events Error:", error);
@@ -81,10 +80,10 @@ export default function ManageEventsPage() {
   // Loading State
   if (isPending || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f5f8fa]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f8faf7]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-10 w-10 animate-spin text-teal-600" />
-          <p className="text-sm font-medium text-gray-500">
+          <Loader2 className="h-10 w-10 animate-spin text-[#34765a]" />
+          <p className="text-sm font-medium text-[#64756b]">
             Loading your events...
           </p>
         </div>
@@ -93,23 +92,22 @@ export default function ManageEventsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f8fa] px-4 py-12">
+    <main className="min-h-screen bg-[#f8faf7] px-4 py-12">
       <div className="mx-auto max-w-6xl">
 
         {/* Page Header */}
-        <div className="mb-8 flex flex-col justify-between gap-6 border-b border-gray-200 pb-6 sm:flex-row sm:items-center">
-
+        <div className="mb-8 flex flex-col justify-between gap-6 border-b border-[#e4ebe5] pb-6 sm:flex-row sm:items-center">
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#eaf3ec] px-3 py-1 text-xs font-semibold text-[#34765a]">
               <Settings size={14} />
               Organizer Dashboard
             </div>
 
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#263b30] md:text-4xl">
               Manage My Events
             </h1>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#718077]">
               View and manage the social initiatives you have published.
               Track your events and make a difference in your community.
             </p>
@@ -118,7 +116,7 @@ export default function ManageEventsPage() {
           {/* Create Event Button */}
           <Link
             href="/create-event"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#34765a] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#285c45]"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             Create New Event
@@ -126,56 +124,52 @@ export default function ManageEventsPage() {
         </div>
 
         {/* Event Statistics */}
-        <div className="mb-8 flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-
-          <div className="rounded-xl bg-teal-50 p-3">
-            <CalendarCheck className="h-7 w-7 text-teal-600" />
+        <div className="mb-8 flex items-center gap-4 rounded-2xl border border-[#e7eee8] bg-white p-5 shadow-sm">
+          <div className="rounded-xl bg-[#eaf3ec] p-3">
+            <CalendarCheck className="h-7 w-7 text-[#34765a]" />
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-[#718077]">
               Total Published Events
             </p>
 
-            <h2 className="text-2xl font-extrabold text-gray-800">
+            <h2 className="text-2xl font-extrabold text-[#263b30]">
               {events.length}
             </h2>
           </div>
         </div>
 
         {/* Events Heading */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">
-              My Published Events
-            </h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-[#263b30]">
+            My Published Events
+          </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
-              All events created by you
-            </p>
-          </div>
+          <p className="mt-1 text-sm text-[#718077]">
+            All events created by you
+          </p>
         </div>
 
         {/* Empty State */}
         {events.length === 0 ? (
-          <div className="flex min-h-[350px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white px-5 text-center">
-
-            <div className="mb-5 rounded-full bg-teal-50 p-5">
-              <HeartHandshake className="h-12 w-12 text-teal-600" />
+          <div className="flex min-h-[350px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#cbd9ce] bg-white px-5 text-center">
+            <div className="mb-5 rounded-full bg-[#eaf3ec] p-5">
+              <HeartHandshake className="h-12 w-12 text-[#34765a]" />
             </div>
 
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold text-[#263b30]">
               No Events Created Yet
             </h2>
 
-            <p className="mt-2 max-w-md text-sm leading-6 text-gray-500">
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#718077]">
               You haven&apos;t published any events yet. Start your first
               community initiative and inspire others to make a difference.
             </p>
 
             <Link
               href="/create-event"
-              className="mt-6 inline-flex items-center justify-center rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-700"
+              className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#34765a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#285c45]"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Your First Event
@@ -185,16 +179,13 @@ export default function ManageEventsPage() {
 
           /* Event Cards */
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
             {events.map((event) => (
               <Card
                 key={event._id}
-                className="group overflow-hidden rounded-xl border border-gray-200 bg-white p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group overflow-hidden rounded-2xl border border-[#e5ece6] bg-white p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
-
                 {/* Event Image */}
-                <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-
+                <div className="relative h-48 w-full overflow-hidden bg-[#edf3ed]">
                   {event.imageUrl ? (
                     <Image
                       src={event.imageUrl}
@@ -205,17 +196,17 @@ export default function ManageEventsPage() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">
-                      <HeartHandshake className="h-14 w-14 text-gray-300" />
+                      <HeartHandshake className="h-14 w-14 text-[#b8c9bc]" />
                     </div>
                   )}
 
                   {/* Event Type */}
-                  <span className="absolute left-3 top-3 rounded-full bg-emerald-50/95 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm">
+                  <span className="absolute left-3 top-3 rounded-full bg-[#edf6ee]/95 px-3 py-1.5 text-xs font-semibold text-[#34765a] shadow-sm">
                     {event.eventType}
                   </span>
 
                   {/* Event Date */}
-                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg bg-gray-900/75 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm">
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg bg-[#263b30]/85 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm">
                     <CalendarDays size={14} />
 
                     {new Date(
@@ -230,16 +221,15 @@ export default function ManageEventsPage() {
 
                 {/* Event Information */}
                 <div className="p-5">
-
-                  <h3 className="line-clamp-1 text-lg font-bold text-teal-700">
+                  <h3 className="line-clamp-1 text-lg font-bold text-[#34765a]">
                     {event.eventTitle}
                   </h3>
 
                   {/* Location */}
-                  <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                  <div className="mt-3 flex items-center gap-2 text-sm text-[#718077]">
                     <MapPin
                       size={15}
-                      className="shrink-0 text-teal-600"
+                      className="shrink-0 text-[#34765a]"
                     />
 
                     <span className="line-clamp-1">
@@ -248,20 +238,20 @@ export default function ManageEventsPage() {
                   </div>
 
                   {/* Description */}
-                  <p className="mt-3 line-clamp-2 min-h-10 text-sm leading-6 text-gray-500">
+                  <p className="mt-3 line-clamp-2 min-h-10 text-sm leading-6 text-[#718077]">
                     {event.description}
                   </p>
 
                   {/* Organizer */}
-                  <div className="mt-4 border-t border-gray-100 pt-4">
-                    <p className="mb-4 truncate text-xs text-gray-400">
+                  <div className="mt-4 border-t border-[#edf1ed] pt-4">
+                    <p className="mb-4 truncate text-xs text-[#91a096]">
                       Organizer: {event.creatorEmail}
                     </p>
 
                     {/* Only View Details Button */}
                     <Link
                       href={`/events/${event._id}`}
-                      className="inline-flex w-full items-center justify-center rounded-lg border border-teal-100 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700 transition hover:border-teal-600 hover:bg-teal-600 hover:text-white"
+                      className="inline-flex w-full items-center justify-center rounded-lg border border-[#d8e8dc] bg-[#edf6ee] px-4 py-2.5 text-sm font-semibold text-[#34765a] transition hover:border-[#34765a] hover:bg-[#34765a] hover:text-white"
                     >
                       <Eye size={16} className="mr-2" />
                       View Details
@@ -270,7 +260,6 @@ export default function ManageEventsPage() {
                 </div>
               </Card>
             ))}
-
           </div>
         )}
       </div>

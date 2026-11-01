@@ -58,7 +58,6 @@ const CreateEventPage = () => {
   // Only future dates are allowed (tomorrow onwards)
   useEffect(() => {
     const date = new Date();
-
     date.setDate(date.getDate() + 1);
 
     const tomorrow = new Date(
@@ -72,6 +71,7 @@ const CreateEventPage = () => {
     }
   }, []);
 
+  // Handle Input Change
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -85,6 +85,7 @@ const CreateEventPage = () => {
     }));
   };
 
+  // Handle Event Submit
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -94,7 +95,7 @@ const CreateEventPage = () => {
       return;
     }
 
-    // Validate future date again before submitting
+    // Validate future date
     const date = new Date();
     date.setDate(date.getDate() + 1);
 
@@ -125,12 +126,17 @@ const CreateEventPage = () => {
         },
         body: JSON.stringify(eventData),
       });
+
       const result = await response.json();
+
       if (!response.ok) {
         throw new Error(result.message || "Failed to create event");
       }
-      toast.success("Event created successfully!");
 
+      // Success Toast
+      toast.success("Event published successfully!");
+
+      // Reset Form
       setFormData({
         eventTitle: "",
         eventType: "",
@@ -140,8 +146,9 @@ const CreateEventPage = () => {
         description: "",
       });
 
-      router.push("/upcoming-events");
+      // Stay on Create Event Page
       router.refresh();
+
     } catch (error) {
       console.error("Create Event Error:", error);
 
@@ -155,10 +162,11 @@ const CreateEventPage = () => {
     }
   };
 
+  // Authentication Loading
   if (isPending || !session) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f5f8fa]">
-        <p className="text-sm font-medium text-emerald-700">
+      <main className="flex min-h-screen items-center justify-center bg-[#f8faf7]">
+        <p className="text-sm font-medium text-[#34765a]">
           Checking authentication...
         </p>
       </main>
@@ -166,31 +174,33 @@ const CreateEventPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f8fa] px-4 py-10">
-      <div className="mx-auto max-w-130">
+    <main className="min-h-screen bg-[#f8faf7] px-4 py-10">
+      <div className="mx-auto max-w-3xl">
 
+        {/* Back Link */}
         <Link
           href="/upcoming-events"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-emerald-700"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#718077] transition hover:text-[#34765a]"
         >
           <ArrowLeft size={16} />
           Back to Upcoming Events
         </Link>
 
-        <Card className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
+        <Card className="overflow-hidden rounded-3xl border border-[#e5ece6] bg-white shadow-sm">
           <CardContent className="p-6 sm:p-8">
 
+            {/* Header */}
             <div className="mb-7">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#eaf3ec] px-3 py-1 text-xs font-semibold text-[#34765a]">
                 <Sparkles size={13} />
                 Social Service Drive
               </div>
 
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-[#263b30] sm:text-3xl">
                 Create a Community Event
               </h1>
 
-              <p className="mt-2 text-sm leading-6 text-gray-500">
+              <p className="mt-2 text-sm leading-6 text-[#718077]">
                 Organize a local relief effort, environmental cleanup, or
                 community support drive.
               </p>
@@ -200,7 +210,7 @@ const CreateEventPage = () => {
 
               {/* Event Title */}
               <div className="space-y-2">
-                <label className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
                   <Type size={15} />
                   Event Title <span className="text-red-500">*</span>
                 </label>
@@ -211,15 +221,16 @@ const CreateEventPage = () => {
                   value={formData.eventTitle}
                   onChange={handleChange}
                   required
-                  className="h-11 rounded-xl bg-gray-50"
+                  className="h-11 rounded-xl border-[#e2eae3] bg-[#f8faf7]"
                 />
               </div>
 
               {/* Event Type and Date */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
+                {/* Event Type */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                  <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
                     <Tag size={15} />
                     Event Type <span className="text-red-500">*</span>
                   </label>
@@ -229,7 +240,7 @@ const CreateEventPage = () => {
                     value={formData.eventType}
                     onChange={handleChange}
                     required
-                    className="h-11 w-full rounded-xl border border-input bg-gray-50 px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                    className="h-11 w-full rounded-xl border border-[#e2eae3] bg-[#f8faf7] px-3 text-sm outline-none focus:border-[#34765a] focus:ring-2 focus:ring-[#eaf3ec]"
                   >
                     <option value="">Select Event Type</option>
 
@@ -241,8 +252,9 @@ const CreateEventPage = () => {
                   </select>
                 </div>
 
+                {/* Event Date */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                  <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
                     <CalendarDays size={15} />
                     Event Date <span className="text-red-500">*</span>
                   </label>
@@ -254,10 +266,10 @@ const CreateEventPage = () => {
                     value={formData.eventDate}
                     onChange={handleChange}
                     required
-                    className="h-11 rounded-xl bg-gray-50"
+                    className="h-11 rounded-xl border-[#e2eae3] bg-[#f8faf7]"
                   />
 
-                  <p className="text-[11px] text-gray-400">
+                  <p className="text-[11px] text-[#91a096]">
                     Select a future date.
                   </p>
                 </div>
@@ -265,7 +277,7 @@ const CreateEventPage = () => {
 
               {/* Location */}
               <div className="space-y-2">
-                <label className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
                   <MapPin size={15} />
                   Location / Venue <span className="text-red-500">*</span>
                 </label>
@@ -276,13 +288,13 @@ const CreateEventPage = () => {
                   value={formData.location}
                   onChange={handleChange}
                   required
-                  className="h-11 rounded-xl bg-gray-50"
+                  className="h-11 rounded-xl border-[#e2eae3] bg-[#f8faf7]"
                 />
               </div>
 
               {/* Image URL */}
               <div className="space-y-2">
-                <label className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
                   <ImageIcon size={15} />
                   Thumbnail Image URL <span className="text-red-500">*</span>
                 </label>
@@ -294,13 +306,13 @@ const CreateEventPage = () => {
                   value={formData.imageUrl}
                   onChange={handleChange}
                   required
-                  className="h-11 rounded-xl bg-gray-50"
+                  className="h-11 rounded-xl border-[#e2eae3] bg-[#f8faf7]"
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-800">
+                <label className="text-sm font-semibold text-[#263b30]">
                   Event Description <span className="text-red-500">*</span>
                 </label>
 
@@ -310,7 +322,7 @@ const CreateEventPage = () => {
                   value={formData.description}
                   onChange={handleChange}
                   required
-                  className="min-h-32 resize-y rounded-xl bg-gray-50"
+                  className="min-h-32 resize-y rounded-xl border-[#e2eae3] bg-[#f8faf7]"
                 />
               </div>
 
@@ -318,13 +330,16 @@ const CreateEventPage = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-12 w-full rounded-xl bg-emerald-600 text-base font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                className="h-12 w-full rounded-xl bg-[#34765a] text-base font-semibold text-white shadow-sm transition hover:bg-[#285c45]"
               >
                 <Sparkles size={17} className="mr-2" />
-                {isSubmitting ? "Publishing Event..." : "Publish Event"}
+
+                {isSubmitting
+                  ? "Publishing Event..."
+                  : "Publish Event"}
               </Button>
 
-              <p className="text-center text-xs text-gray-400">
+              <p className="text-center text-xs text-[#91a096]">
                 Make a difference in your community with KindNest.
               </p>
 
