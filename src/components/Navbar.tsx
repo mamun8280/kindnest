@@ -1,9 +1,9 @@
-
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Menu,
@@ -19,29 +19,173 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-interface User {
-  name: string;
-  image?: string | null;
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { authClient } from "@/lib/auth-client";
+
+type ProfileMenuProps = {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+  handleLogout: () => void;
+  router: ReturnType<typeof useRouter>;
+};
+
+function ProfileMenu({
+  user,
+  handleLogout,
+  router,
+}: ProfileMenuProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const userName = user.name || "KindNest User";
+  const userInitial = userName.charAt(0).toUpperCase();
+
+  const profileImage =
+    user.image && !imageError ? user.image : undefined;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center gap-2 rounded-full border border-green-100 p-1.5 transition hover:bg-green-50">
+        <Avatar className="h-10 w-10 border-2 border-green-200">
+          {profileImage && (
+            <AvatarImage
+              src={profileImage}
+              alt={userName}
+              referrerPolicy="no-referrer"
+              onError={() => setImageError(true)}
+            />
+          )}
+
+          <AvatarFallback className="bg-green-100 font-bold text-green-800">
+            {userInitial}
+          </AvatarFallback>
+        </Avatar>
+
+        <ChevronDown size={16} className="mr-1 text-green-800" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-64 rounded-xl p-2">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="p-3">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-11 w-11">
+                {profileImage && (
+                  <AvatarImage
+                    src={profileImage}
+                    alt={userName}
+                    referrerPolicy="no-referrer"
+                    onError={() => setImageError(true)}
+                  />
+                )}
+
+                <AvatarFallback className="bg-green-100 font-bold text-green-800">
+                  {userInitial}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex min-w-0 flex-col gap-1">
+                <span className="truncate font-semibold text-green-900">
+                  {userName}
+                </span>
+
+                <span className="truncate text-xs font-normal text-gray-500">
+                  {user.email}
+                </span>
+              </div>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() => router.push("/create-event")}
+          className="cursor-pointer gap-3 py-3"
+        >
+          <PlusCircle size={18} className="text-green-700" />
+          Create Event
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => router.push("/manage-events")}
+          className="cursor-pointer gap-3 py-3"
+        >
+          <LayoutDashboard size={18} className="text-green-700" />
+          Manage Events
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => router.push("/joined-events")}
+          className="cursor-pointer gap-3 py-3"
+        >
+          <Heart size={18} className="text-green-700" />
+          Joined Events
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="cursor-pointer gap-3 py-3 text-red-600 focus:bg-red-50 focus:text-red-600"
+        >
+          <LogOut size={18} />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Temporary user - পরে Better Auth connect করব
-  const user: User | null = null;
+  const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  const user = session?.user;
 
   const closeMenu = () => setIsOpen(false);
 
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+
+      closeMenu();
+
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-green-100 bg-white/95 shadow-sm backdrop-blur-md">
+    <section className="sticky top-0 z-50 border-b border-green-100 bg-white/95 shadow-sm backdrop-blur-md">
       <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
-        {/* Mobile Hamburger - Left Side */}
+        {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="mr-3 rounded-xl border border-green-100 p-2 text-green-900 transition hover:bg-green-50 md:hidden"
+          className="mr-3 rounded-xl border border-green-100 p-2 text-green-900 hover:bg-green-50 md:hidden"
           aria-label="Toggle navigation"
-          aria-expanded={isOpen}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -59,8 +203,7 @@ export default function Navbar() {
 
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-green-900">
-              <Link
-            href="/" >KindNest </Link>  <span className="text-lime-500">.</span>
+              KindNest <span className="text-lime-500">.</span>
             </h1>
 
             <p className="text-[10px] font-semibold tracking-[2px] text-gray-500">
@@ -71,10 +214,6 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-8 md:flex">
-         
-            
-        
-
           <Link
             href="/upcoming-events"
             className="font-medium text-gray-700 transition hover:text-green-700"
@@ -83,93 +222,45 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Authentication */}
+        {/* Desktop Profile / Login */}
         <div className="hidden items-center gap-4 md:flex">
-          {user ? (
-            <div className="group relative">
-
-              <button
-                className="flex items-center gap-2 rounded-full border border-green-100 p-1.5 transition hover:bg-green-50"
-                aria-label="User profile menu"
-              >
-                <Image
-                  src={user.image || "/default-avatar.png"}
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full border-2 border-green-200 object-cover"
-                />
-
-                <ChevronDown
-                  size={16}
-                  className="mr-1 text-green-800"
-                />
-              </button>
-
-              {/* User Name */}
-              <span className="pointer-events-none absolute right-0 top-14 hidden whitespace-nowrap rounded-lg bg-green-900 px-3 py-2 text-xs text-white shadow-lg group-hover:block">
-                {user.name}
-              </span>
-
-              {/* Profile Dropdown */}
-              <div className="invisible absolute right-0 top-14 w-56 translate-y-2 rounded-xl border border-green-100 bg-white p-2 opacity-0 shadow-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
-
-                <Link
-                  href="/create-event"
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-800"
-                >
-                  <PlusCircle size={18} />
-                  Create Event
-                </Link>
-
-                <Link
-                  href="/manage-events"
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-800"
-                >
-                  <LayoutDashboard size={18} />
-                  Manage Events
-                </Link>
-
-                <Link
-                  href="/joined-events"
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-800"
-                >
-                  <Heart size={18} />
-                  Joined Events
-                </Link>
-
-                <div className="my-1 border-t border-gray-100" />
-
-                <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              </div>
-            </div>
+          {isPending ? (
+            <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
+          ) : user ? (
+            <ProfileMenu
+              user={user}
+              handleLogout={handleLogout}
+              router={router}
+            />
           ) : (
-            <Link href="/login">
-              <Button className="rounded-full bg-green-800 px-7 py-5 font-semibold text-white shadow-md transition hover:bg-green-900">
-                <LogIn size={17} className="mr-2" />
-                Login
-              </Button>
+            <Link
+              href="/login"
+              className="flex items-center rounded-full bg-green-800 px-7 py-3 font-semibold text-white hover:bg-green-900"
+            >
+              <LogIn size={17} className="mr-2" />
+              Login
             </Link>
           )}
         </div>
 
         {/* Mobile Profile */}
-        {user && (
-          <div className="ml-auto md:hidden">
-            <Image
-              src={user.image || "/default-avatar.png"}
-              alt="Profile"
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-full border-2 border-green-200 object-cover"
-            />
-          </div>
-        )}
+        <div className="ml-auto md:hidden">
+          {!isPending &&
+            (user ? (
+              <ProfileMenu
+                user={user}
+                handleLogout={handleLogout}
+                router={router}
+              />
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-full bg-green-800 px-5 py-2 text-sm font-semibold text-white hover:bg-green-900"
+              >
+                Login
+              </Link>
+            ))}
+        </div>
       </nav>
 
       {/* Mobile Navigation */}
@@ -180,7 +271,7 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={closeMenu}
-              className="rounded-lg px-4 py-3 font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-800"
+              className="rounded-lg px-4 py-3 font-medium text-gray-700 hover:bg-green-50"
             >
               Home
             </Link>
@@ -188,29 +279,19 @@ export default function Navbar() {
             <Link
               href="/upcoming-events"
               onClick={closeMenu}
-              className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-800"
+              className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-gray-700 hover:bg-green-50"
             >
               <CalendarDays size={18} />
               Upcoming Events
             </Link>
 
-            {user ? (
+            {user && (
               <>
                 <div className="my-2 border-t border-gray-100" />
 
-                <div className="flex items-center gap-3 px-4 py-2">
-                  <Image
-                    src={user.image || "/default-avatar.png"}
-                    alt="Profile"
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-
-                  <span className="font-semibold text-green-900">
-                    {user.name}
-                  </span>
-                </div>
+                <p className="px-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  My Account
+                </p>
 
                 <Link
                   href="/create-event"
@@ -239,28 +320,19 @@ export default function Navbar() {
                   Joined Events
                 </Link>
 
-                <button
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-left text-red-600 hover:bg-red-50"
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  className="justify-start gap-3 px-4 text-red-600 hover:bg-red-50 hover:text-red-600"
                 >
                   <LogOut size={18} />
                   Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                onClick={closeMenu}
-                className="mt-3"
-              >
-                <Button className="w-full rounded-full bg-green-800 py-5 text-white hover:bg-green-900">
-                  <LogIn size={18} className="mr-2" />
-                  Login
                 </Button>
-              </Link>
+              </>
             )}
           </div>
         </div>
       )}
-    </header>
+    </section>
   );
 }
