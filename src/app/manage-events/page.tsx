@@ -54,7 +54,7 @@ export default function ManageEventsPage() {
       router.replace("/login?callbackURL=/manage-events");
       return;
     }
-
+// commit
     const fetchEvents = async () => {
       try {
         setLoading(true);
