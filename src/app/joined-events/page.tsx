@@ -402,13 +402,7 @@ export default function JoinedEventsPage() {
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-white shadow-sm backdrop-blur-md">
                       <CalendarDays size={15} />
                       <span className="text-xs font-semibold">
-                        {new Date(
-                          `${event.eventDate.slice(0, 10)}T00:00:00`
-                        ).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {formatDate(event.eventDate)}
                       </span>
                     </div>
 
@@ -448,13 +442,7 @@ export default function JoinedEventsPage() {
                     <div className="mt-4 flex items-center gap-2 border-t border-[#34765A]/10 pt-4 text-xs text-[#91A096]">
                       <Clock size={14} className="text-[#34765A]" />
                       <span>
-                        Joined: {new Date(
-                          `${event.joinedAt.slice(0, 10)}T00:00:00`
-                        ).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        Joined: {formatDate(event.joinedAt)}
                       </span>
                     </div>
 

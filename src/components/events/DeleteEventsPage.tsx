@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -81,44 +80,52 @@ const DeleteEventsPage = ({
 
   return (
     <AlertDialog>
+      {/* DELETE BUTTON */}
       <AlertDialogTrigger
         render={
           <Button
+            type="button"
             variant="destructive"
-            className="rounded-lg"
             disabled={isDeleting}
+            className="rounded-lg border border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700 hover:text-white dark:border-red-600 dark:bg-red-600 dark:text-white dark:hover:border-red-700 dark:hover:bg-red-700 dark:hover:text-white"
           >
             <X data-icon="inline-start" />
             Delete
           </Button>
         }
-      >
-        Delete
-      </AlertDialogTrigger>
+      />
 
-      <AlertDialogContent>
+      {/* CONFIRMATION DIALOG */}
+      <AlertDialogContent className="border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+
         <AlertDialogHeader>
-          <AlertDialogTitle>
+          <AlertDialogTitle className="text-gray-900 dark:text-white">
             Are you absolutely sure?
           </AlertDialogTitle>
 
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-gray-600 dark:text-slate-400">
             This action cannot be undone. This will permanently
             delete the event from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
+          {/* CANCEL BUTTON */}
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+          >
             Cancel
           </AlertDialogCancel>
 
+          {/* CONFIRM DELETE BUTTON */}
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
               handleDeleteEvents();
             }}
             disabled={isDeleting}
+            className="border border-red-500 bg-red-400 text-white hover:border-red-500 hover:bg-red-700 dark:border-red-600 dark:bg-red-600 dark:text-white dark:hover:border-red-600 dark:hover:bg-red-700"
           >
             {isDeleting ? (
               <>
@@ -130,6 +137,7 @@ const DeleteEventsPage = ({
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
+
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -122,6 +122,9 @@ const CreateEventPage = () => {
 
 
       const { data, error } = await authClient.token()
+      if (error) {
+        throw new Error("Failed to retrieve token. Please login again.");
+        }
       const token = data?.token
 
       const response = await fetch("http://localhost:8000/create-event", {
