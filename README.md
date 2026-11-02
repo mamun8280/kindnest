@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌱 KindNest – Social Development Events Platform
 
-## Getting Started
+## 📌 Project Name & Description
 
-First, run the development server:
+**KindNest** is a community-driven social development events platform where people can create, join, and participate in social service activities in their local communities.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The platform aims to bring people together to make a positive impact on society through activities such as winter clothes distribution, blanket distribution, and other community support initiatives.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Live Website Link
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- - **Live Website:** [KindNest](https://kindnest-one.vercel.app)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Main Features
 
-## Learn More
+- **User Authentication:** Secure login and registration system.
+- **Social Login:** Sign in using Google or GitHub.
+- **Create Events:** Authenticated users can create social development events.
+- **Upcoming Events:** Browse upcoming community service events.
+- **Event Details:** View detailed information about events after authentication.
+- **Join Events:** Users can participate in community events.
+- **Manage Events:** Event creators can manage their created events.
+- **Edit & Delete Events:** Update or delete events when needed.
+- **Joined Events:** View events that the user has joined.
+- **Leave Events:** Users can leave events they previously joined.
+- **Responsive Design:** Optimized for desktop, tablet, and mobile devices.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Technologies Used
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Frontend:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js
+- React.js
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Lucide React
 
-## Deploy on Vercel
+**Backend:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Node.js
+- Express.js
+- MongoDB
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Authentication & Security:**
+
+- Better Auth
+- JWT (JSON Web Token)
+
+**Other Tools:**
+
+- Git & GitHub
+- Vercel
+- Sonner (Toast Notifications)
