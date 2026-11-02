@@ -67,7 +67,7 @@ export default function JoinedEventsPage() {
         }
 
         const response = await fetch(
-          "http://localhost:8000/joined-events",
+          "https://kind-nest-server-j7a2.vercel.app/joined-events",
           {
             method: "GET",
             credentials: "include",

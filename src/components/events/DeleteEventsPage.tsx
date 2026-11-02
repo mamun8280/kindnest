@@ -42,7 +42,7 @@ const DeleteEventsPage = ({
       setIsDeleting(true);
 
       const res = await fetch(
-        `http://localhost:8000/ManageEvents/${id}`,
+        `https://kind-nest-server-j7a2.vercel.app/ManageEvents/${id}`,
         {
           method: "DELETE",
           headers: {

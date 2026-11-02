@@ -61,7 +61,7 @@ const EventDetailsContent = ({ id, jwtToken }: EventDetailsProps) => {
         setLoading(true);
 
         const response = await fetch(
-          `http://localhost:8000/ManageEvents/${id}`,
+          `https://kind-nest-server-j7a2.vercel.app/ManageEvents/${id}`,
           {
             method: "GET",
             headers: jwtToken
@@ -113,7 +113,7 @@ const EventDetailsContent = ({ id, jwtToken }: EventDetailsProps) => {
     const checkJoinedStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/joined-events/${id}`,
+          `https://kind-nest-server-j7a2.vercel.app/joined-events/${id}`,
           {
             method: "GET",
             headers: jwtToken
@@ -206,7 +206,7 @@ const EventDetailsContent = ({ id, jwtToken }: EventDetailsProps) => {
     try {
       setJoining(true);
 
-      const response = await fetch(`http://localhost:8000/join-event/${id}`, {
+      const response = await fetch(`https://kind-nest-server-j7a2.vercel.app/join-event/${id}`, {
         method: "POST",
         headers: jwtToken
           ? {

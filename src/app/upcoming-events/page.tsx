@@ -58,7 +58,7 @@ const UpcomingEventsPage = () => {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/upcoming-events",
+          "https://kind-nest-server-j7a2.vercel.app/upcoming-events",
           {
             cache: "no-store",
           }

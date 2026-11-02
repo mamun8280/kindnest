@@ -127,7 +127,7 @@ const CreateEventPage = () => {
         }
       const token = data?.token
 
-      const response = await fetch("http://localhost:8000/create-event", {
+      const response = await fetch("https://kind-nest-server-j7a2.vercel.app/create-event", {
         method: "POST",
         credentials: "include",
         headers: {

@@ -65,7 +65,7 @@ export default function ManageEventsPage() {
          const token = data?.token
 
         const response = await fetch(
-          "http://localhost:8000/ManageEvents",
+          "https://kind-nest-server-j7a2.vercel.app/ManageEvents",
           {
             method: "GET",
             credentials: "include",

@@ -150,7 +150,7 @@ const EditEventPage = ({
       setIsSubmitting(true);
 
       const response = await fetch(
-        `http://localhost:8000/ManageEvents/${event._id}`,
+        `https://kind-nest-server-j7a2.vercel.app/ManageEvents/${event._id}`,
         {
           method: "PATCH",
           headers: {

@@ -34,7 +34,7 @@ export default function LeaveEventButton({
       }
 
       const response = await fetch(
-        `http://localhost:8000/leave-event/${eventId}`,
+        `https://kind-nest-server-j7a2.vercel.app/leave-event/${eventId}`,
         {
           method: "DELETE",
           credentials: "include",
