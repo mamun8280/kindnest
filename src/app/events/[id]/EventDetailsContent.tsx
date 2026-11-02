@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -32,11 +32,13 @@ import EditEventPage, {
 
 import DeleteEventsPage from "@/components/events/DeleteEventsPage";
 
-const EventDetailsContent = () => {
-  const params = useParams();
-  const router = useRouter();
+type EventDetailsProps = {
+  id: string;
+  jwtToken: string | null;
+};
 
-  const id = params.id as string;
+const EventDetailsContent = ({ id, jwtToken }: EventDetailsProps) => {
+  const router = useRouter();
 
   const { data: session, isPending } = authClient.useSession();
 
@@ -48,7 +50,7 @@ const EventDetailsContent = () => {
   const [hasJoined, setHasJoined] = useState(false);
   const [joining, setJoining] = useState(false);
 
-  // Fetch Event - Public
+  // Fetch Event
   useEffect(() => {
     if (isPending || !id) return;
 
@@ -60,7 +62,15 @@ const EventDetailsContent = () => {
 
         const response = await fetch(
           `http://localhost:8000/ManageEvents/${id}`,
-          { cache: "no-store" }
+          {
+            method: "GET",
+            headers: jwtToken
+              ? {
+                  Authorization: `Bearer ${jwtToken}`,
+                }
+              : {},
+            cache: "no-store",
+          },
         );
 
         const result = await response.json();
@@ -77,9 +87,7 @@ const EventDetailsContent = () => {
 
         if (!cancelled) {
           toast.error(
-            error instanceof Error
-              ? error.message
-              : "Something went wrong!"
+            error instanceof Error ? error.message : "Something went wrong!",
           );
         }
       } finally {
@@ -94,7 +102,7 @@ const EventDetailsContent = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, isPending]);
+  }, [id, isPending, jwtToken]);
 
   // Check Join Status
   useEffect(() => {
@@ -108,16 +116,19 @@ const EventDetailsContent = () => {
           `http://localhost:8000/joined-events/${id}`,
           {
             method: "GET",
+            headers: jwtToken
+              ? {
+                  Authorization: `Bearer ${jwtToken}`,
+                }
+              : {},
             credentials: "include",
-          }
+          },
         );
 
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(
-            result.message || "Failed to check joined status"
-          );
+          throw new Error(result.message || "Failed to check joined status");
         }
 
         if (!cancelled) {
@@ -133,7 +144,7 @@ const EventDetailsContent = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, isPending, session?.user?.email]);
+  }, [id, isPending, session?.user?.email, jwtToken]);
 
   // Loading State
   if (isPending || loading) {
@@ -181,15 +192,12 @@ const EventDetailsContent = () => {
 
   // Event Owner Check
   const isOwner =
-    !!session?.user?.email &&
-    event.creatorEmail === session.user.email;
+    !!session?.user?.email && event.creatorEmail === session.user.email;
 
   // Join Event Handler
   const handleJoinEvent = async () => {
     if (!session?.user?.email) {
-      router.push(
-        `/login?callbackURL=${encodeURIComponent(`/events/${id}`)}`
-      );
+      router.push(`/login?callbackURL=${encodeURIComponent(`/events/${id}`)}`);
       return;
     }
 
@@ -198,13 +206,15 @@ const EventDetailsContent = () => {
     try {
       setJoining(true);
 
-      const response = await fetch(
-        `http://localhost:8000/join-event/${id}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`http://localhost:8000/join-event/${id}`, {
+        method: "POST",
+        headers: jwtToken
+          ? {
+              Authorization: `Bearer ${jwtToken}`,
+            }
+          : {},
+        credentials: "include",
+      });
 
       const result = await response.json();
 
@@ -219,14 +229,13 @@ const EventDetailsContent = () => {
       }
 
       setHasJoined(true);
+
       toast.success("You have successfully joined this event!");
     } catch (error) {
       console.error("Join Event Error:", error);
 
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong!"
+        error instanceof Error ? error.message : "Something went wrong!",
       );
     } finally {
       setJoining(false);
@@ -235,7 +244,7 @@ const EventDetailsContent = () => {
 
   // Format Date
   const formattedDate = new Date(
-    `${event.eventDate.slice(0, 10)}T00:00:00`
+    `${event.eventDate.slice(0, 10)}T00:00:00`,
   ).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -272,6 +281,7 @@ const EventDetailsContent = () => {
                 <p className="text-sm font-bold text-[#263b30]">
                   Organizer Controls
                 </p>
+
                 <p className="mt-1 text-xs text-[#91a096]">
                   Manage your published event
                 </p>
@@ -286,7 +296,10 @@ const EventDetailsContent = () => {
                   Edit Event
                 </Button>
 
-                <DeleteEventsPage id={event._id} />
+                <DeleteEventsPage
+                  id={event._id}
+                  jwtToken={jwtToken || ""}
+                />
               </div>
             </div>
           )}
@@ -338,9 +351,7 @@ const EventDetailsContent = () => {
 
                 <div className="flex items-center gap-2">
                   <MapPin size={17} />
-                  <span className="line-clamp-1">
-                    {event.location}
-                  </span>
+                  <span className="line-clamp-1">{event.location}</span>
                 </div>
               </div>
             </div>
@@ -348,7 +359,6 @@ const EventDetailsContent = () => {
 
           {/* Event Content */}
           <CardContent className="p-5 sm:p-8 lg:p-10">
-
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
 
               {/* Left Content */}
@@ -386,6 +396,7 @@ const EventDetailsContent = () => {
                         <p className="text-xs font-medium text-[#91a096]">
                           Event Date
                         </p>
+
                         <p className="mt-1 text-sm font-bold text-[#263b30]">
                           {formattedDate}
                         </p>
@@ -402,6 +413,7 @@ const EventDetailsContent = () => {
                         <p className="text-xs font-medium text-[#91a096]">
                           Event Location
                         </p>
+
                         <p className="mt-1 wrap-break-word text-sm font-bold text-[#263b30]">
                           {event.location}
                         </p>
@@ -418,12 +430,12 @@ const EventDetailsContent = () => {
                         <p className="text-xs font-medium text-[#91a096]">
                           Event Category
                         </p>
+
                         <p className="mt-1 text-sm font-bold text-[#263b30]">
                           {event.eventType}
                         </p>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
@@ -438,6 +450,7 @@ const EventDetailsContent = () => {
                       <p className="text-xs font-medium text-[#91a096]">
                         Organized By
                       </p>
+
                       <p className="mt-1 break-all text-sm font-bold text-[#263b30]">
                         {event.creatorEmail}
                       </p>
@@ -458,9 +471,8 @@ const EventDetailsContent = () => {
                   </h3>
 
                   <p className="mt-3 text-sm leading-7 text-[#718077]">
-                    Your participation can make a real difference.
-                    Join this community initiative and help create
-                    a positive impact.
+                    Your participation can make a real difference. Join this
+                    community initiative and help create a positive impact.
                   </p>
 
                   <div className="my-6 space-y-3 border-y border-[#e2ebe3] py-5">
@@ -527,7 +539,6 @@ const EventDetailsContent = () => {
                   )}
                 </div>
               </aside>
-
             </div>
 
             {/* Bottom Navigation */}
@@ -549,7 +560,6 @@ const EventDetailsContent = () => {
                 <ArrowUpRight size={16} />
               </Link>
             </div>
-
           </CardContent>
         </Card>
 
@@ -559,12 +569,12 @@ const EventDetailsContent = () => {
             event={event}
             open={editOpen}
             onOpenChange={setEditOpen}
+            jwtToken={jwtToken}
             onUpdated={(updatedEvent: EventData) => {
               setEvent(updatedEvent);
             }}
           />
         )}
-
       </div>
     </main>
   );

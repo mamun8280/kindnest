@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -19,11 +20,25 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-const DeleteEventsPage = ({ id }: { id: string }) => {
+type DeleteEventsPageProps = {
+  id: string;
+  jwtToken: string;
+};
+
+const DeleteEventsPage = ({
+  id,
+  jwtToken,
+}: DeleteEventsPageProps) => {
   const router = useRouter();
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteEvents = async () => {
+    if (!jwtToken) {
+      toast.error("Authentication token not found. Please login again.");
+      return;
+    }
+
     try {
       setIsDeleting(true);
 
@@ -31,14 +46,18 @@ const DeleteEventsPage = ({ id }: { id: string }) => {
         `http://localhost:8000/ManageEvents/${id}`,
         {
           method: "DELETE",
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
         }
       );
 
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.message || "Failed to delete event!");
+        throw new Error(
+          result.message || "Failed to delete event!"
+        );
       }
 
       toast.success("Event deleted successfully!");
@@ -54,6 +73,7 @@ const DeleteEventsPage = ({ id }: { id: string }) => {
           ? error.message
           : "Something went wrong!"
       );
+
     } finally {
       setIsDeleting(false);
     }
@@ -83,8 +103,8 @@ const DeleteEventsPage = ({ id }: { id: string }) => {
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the event
-            from our servers.
+            This action cannot be undone. This will permanently
+            delete the event from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

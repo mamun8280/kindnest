@@ -59,11 +59,18 @@ export default function ManageEventsPage() {
       try {
         setLoading(true);
 
+         const { data, error } = await authClient.token()
+      const token = data?.token
+      
+
         const response = await fetch(
           "http://localhost:8000/ManageEvents",
           {
             method: "GET",
             credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
@@ -71,8 +78,8 @@ export default function ManageEventsPage() {
           throw new Error("Failed to load events!");
         }
 
-        const data = await response.json();
-        setEvents(data);
+        const result = await response.json();
+        setEvents(result);
       } catch (error) {
         console.error("Fetch Events Error:", error);
         toast.error("Failed to load events!");

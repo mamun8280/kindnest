@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
+
 import {
   ArrowLeft,
   CalendarDays,
@@ -119,11 +120,17 @@ const CreateEventPage = () => {
     try {
       setIsSubmitting(true);
 
+
+      const { data, error } = await authClient.token()
+      const token = data?.token
+
       const response = await fetch("http://localhost:8000/create-event", {
         method: "POST",
         credentials: "include",
         headers: {
+          
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(eventData),
       });

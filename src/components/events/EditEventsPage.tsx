@@ -62,6 +62,7 @@ interface EditEventPageProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: (updatedEvent: EventData) => void;
+  jwtToken: string | null;
 }
 
 const EditEventPage = ({
@@ -69,6 +70,7 @@ const EditEventPage = ({
   open,
   onOpenChange,
   onUpdated,
+  jwtToken,
 }: EditEventPageProps) => {
   const getInitialFormData = (): EventFormData => ({
     eventTitle: event.eventTitle || "",
@@ -121,6 +123,12 @@ const EditEventPage = ({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // JWT Validation
+    if (!jwtToken) {
+      toast.error("Authentication required. Please login again.");
+      return;
+    }
+
     // Date Validation
     if (formData.eventDate !== originalEventDate) {
       const tomorrowDate = new Date();
@@ -147,8 +155,8 @@ const EditEventPage = ({
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
           },
-          credentials: "include",
           body: JSON.stringify(formData),
         }
       );
@@ -165,9 +173,13 @@ const EditEventPage = ({
         ...formData,
       };
 
+      // Update Details Page Data
       onUpdated(updatedEvent);
 
+      // Success Toast
       toast.success("Event updated successfully!");
+
+      // Close Edit Dialog
       onOpenChange(false);
 
     } catch (error) {
@@ -200,6 +212,7 @@ const EditEventPage = ({
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-3">
 
+          {/* Event Title */}
           <div className="space-y-2">
             <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
               <Type size={15} />
@@ -216,6 +229,7 @@ const EditEventPage = ({
             />
           </div>
 
+          {/* Event Type & Date */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
             <div className="space-y-2">
@@ -262,6 +276,7 @@ const EditEventPage = ({
             </div>
           </div>
 
+          {/* Location */}
           <div className="space-y-2">
             <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
               <MapPin size={15} />
@@ -278,6 +293,7 @@ const EditEventPage = ({
             />
           </div>
 
+          {/* Image URL */}
           <div className="space-y-2">
             <label className="flex items-center gap-1 text-sm font-semibold text-[#263b30]">
               <ImageIcon size={15} />
@@ -295,6 +311,7 @@ const EditEventPage = ({
             />
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-[#263b30]">
               Event Description <span className="text-red-500">*</span>
@@ -310,12 +327,14 @@ const EditEventPage = ({
             />
           </div>
 
+          {/* Submit Button */}
           <Button
             type="submit"
             disabled={isSubmitting}
             className="h-12 w-full rounded-xl bg-[#34765a] text-base font-semibold text-white shadow-sm transition hover:bg-[#285c45]"
           >
             <Sparkles size={17} className="mr-2" />
+
             {isSubmitting ? "Updating Event..." : "Update Event"}
           </Button>
 

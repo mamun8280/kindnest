@@ -1,8 +1,30 @@
 
 import { Suspense } from "react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import EventDetailsContent from "./EventDetailsContent";
 
-const EventDetailsPage = () => {
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+// Authentication and token fetching
+const EventDetailsData = async ({ params }: Props) => {
+  const { id } = await params;
+
+  const jwtToken = await auth.api.getToken({
+    headers: await headers(),
+  });
+
+  return (
+    <EventDetailsContent
+      id={id}
+      jwtToken={jwtToken?.token ?? null}
+    />
+  );
+};
+
+const EventDetailsPage = (props: Props) => {
   return (
     <Suspense
       fallback={
@@ -13,10 +35,9 @@ const EventDetailsPage = () => {
         </main>
       }
     >
-      <EventDetailsContent />
+      <EventDetailsData {...props} />
     </Suspense>
   );
 };
 
 export default EventDetailsPage;
-

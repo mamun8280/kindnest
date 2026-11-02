@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +12,6 @@ import {
   ArrowRight,
   Loader2,
   HeartHandshake,
-  LogOut,
   Sparkles,
   CalendarCheck,
   CalendarClock,
@@ -21,8 +21,8 @@ import {
   PartyPopper,
 } from "lucide-react";
 
-import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import LeaveEventButton from "@/components/LeaveEventButton";
 
 interface EventData {
   _id: string;
@@ -43,7 +43,6 @@ export default function JoinedEventsPage() {
   const [events, setEvents] = useState<EventData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [leavingId, setLeavingId] = useState<string | null>(null);
 
   // Fetch Joined Events
   useEffect(() => {
@@ -61,12 +60,21 @@ export default function JoinedEventsPage() {
         setLoading(true);
         setError("");
 
+        const { data, error } = await authClient.token();
+
+        if (error || !data?.token) {
+          throw new Error("JWT token not found. Please login again.");
+        }
+
         const response = await fetch(
           "http://localhost:8000/joined-events",
           {
             method: "GET",
             credentials: "include",
             cache: "no-store",
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
           }
         );
 
@@ -111,54 +119,15 @@ export default function JoinedEventsPage() {
     };
   }, [session, isPending, router]);
 
-  // Leave Event Function
-  const handleLeaveEvent = async (eventId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to leave this event?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setLeavingId(eventId);
-
-      const response = await fetch(
-        `http://localhost:8000/leave-event/${eventId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      const contentType = response.headers.get("content-type");
-
-      if (!contentType?.includes("application/json")) {
-        throw new Error("Server JSON response dicche na.");
-      }
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to leave event."
-        );
-      }
-
-      // Remove only this event from Joined Events
-      setEvents((previousEvents) =>
-        previousEvents.filter((event) => event._id !== eventId)
-      );
-
-      toast.success("You have successfully left this event!");
-    } catch (err) {
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong."
-      );
-    } finally {
-      setLeavingId(null);
-    }
+  // Format Date
+  const formatDate = (date: string) => {
+    return new Date(
+      `${date.slice(0, 10)}T00:00:00`
+    ).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   // Loading State
@@ -183,7 +152,6 @@ export default function JoinedEventsPage() {
     return (
       <main className="flex min-h-[70vh] items-center justify-center bg-[#F1F7F1] px-4">
         <div className="w-full max-w-lg rounded-3xl border border-red-100 bg-white p-8 text-center shadow-sm">
-
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50">
             <HeartHandshake className="h-8 w-8 text-red-500" />
           </div>
@@ -202,7 +170,6 @@ export default function JoinedEventsPage() {
           >
             Try Again
           </button>
-
         </div>
       </main>
     );
@@ -214,17 +181,6 @@ export default function JoinedEventsPage() {
       new Date(a.eventDate).getTime() -
       new Date(b.eventDate).getTime()
   );
-
-  // Format Date
-  const formatDate = (date: string) => {
-    return new Date(
-      `${date.slice(0, 10)}T00:00:00`
-    ).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#F1F7F1] px-4 py-12 sm:py-16">
@@ -446,7 +402,13 @@ export default function JoinedEventsPage() {
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-white shadow-sm backdrop-blur-md">
                       <CalendarDays size={15} />
                       <span className="text-xs font-semibold">
-                        {formatDate(event.eventDate)}
+                        {new Date(
+                          `${event.eventDate.slice(0, 10)}T00:00:00`
+                        ).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
 
@@ -486,7 +448,13 @@ export default function JoinedEventsPage() {
                     <div className="mt-4 flex items-center gap-2 border-t border-[#34765A]/10 pt-4 text-xs text-[#91A096]">
                       <Clock size={14} className="text-[#34765A]" />
                       <span>
-                        Joined: {formatDate(event.joinedAt)}
+                        Joined: {new Date(
+                          `${event.joinedAt.slice(0, 10)}T00:00:00`
+                        ).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
 
@@ -502,24 +470,17 @@ export default function JoinedEventsPage() {
                       />
                     </Link>
 
-                    {/* Leave Event Button */}
-                    <button
-                      onClick={() => handleLeaveEvent(event._id)}
-                      disabled={leavingId === event._id}
-                      className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-600 transition-all duration-300 hover:border-red-300 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {leavingId === event._id ? (
-                        <>
-                          <Loader2 size={17} className="animate-spin" />
-                          Leaving...
-                        </>
-                      ) : (
-                        <>
-                          <LogOut size={17} />
-                          Leave Event
-                        </>
-                      )}
-                    </button>
+                    {/* Separate Leave Event Component */}
+                    <LeaveEventButton
+                      eventId={event._id}
+                      onLeaveSuccess={() => {
+                        setEvents((previousEvents) =>
+                          previousEvents.filter(
+                            (item) => item._id !== event._id
+                          )
+                        );
+                      }}
+                    />
 
                   </div>
 
