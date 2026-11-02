@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,12 +10,18 @@ import { toast } from "sonner";
 import {
   CalendarDays,
   MapPin,
-  PlusCircle,
-  Settings,
+  Plus,
   Eye,
   Loader2,
   HeartHandshake,
   CalendarCheck,
+  CalendarClock,
+  History,
+  ArrowUpRight,
+  Sparkles,
+  Settings2,
+  FolderOpen,
+  Heart,
 } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -82,188 +87,363 @@ export default function ManageEventsPage() {
   // Loading State
   if (isPending || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8faf7]">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-10 w-10 animate-spin text-[#34765a]" />
-          <p className="text-sm font-medium text-[#64756b]">
-            Loading your events...
+      <div className="flex min-h-screen items-center justify-center bg-[#F1F7F1]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E5F0E6]">
+            <Loader2 className="h-8 w-8 animate-spin text-[#34765A]" />
+          </div>
+
+          <p className="text-sm font-medium text-[#64756B]">
+            Preparing your dashboard...
           </p>
         </div>
       </div>
     );
   }
 
+  // Event Statistics
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Dhaka",
+  });
+
+  const upcomingEvents = events.filter(
+    (event) => event.eventDate >= today
+  );
+
+  const pastEvents = events.filter(
+    (event) => event.eventDate < today
+  );
+
+  // Date Formatter
+  const formatDate = (date: string) => {
+    return new Date(`${date.slice(0, 10)}T00:00:00`).toLocaleDateString(
+      "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
   return (
-    <main className="min-h-screen bg-[#f8faf7] px-4 py-12">
-      <div className="mx-auto max-w-6xl">
+    <main className="relative min-h-screen overflow-hidden bg-[#F1F7F1] px-4 py-12 sm:py-16">
 
-        {/* Page Header */}
-        <div className="mb-8 flex flex-col justify-between gap-6 border-b border-[#e4ebe5] pb-6 sm:flex-row sm:items-center">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#eaf3ec] px-3 py-1 text-xs font-semibold text-[#34765a]">
-              <Settings size={14} />
-              Organizer Dashboard
+      {/* Background Decorations */}
+      <div className="pointer-events-none absolute -left-40 top-40 h-80 w-80 rounded-full bg-emerald-200/30 blur-[100px]" />
+
+      <div className="pointer-events-none absolute -right-40 bottom-20 h-96 w-96 rounded-full bg-lime-200/30 blur-[100px]" />
+
+      <div className="relative mx-auto max-w-7xl">
+
+        {/* Dashboard Header */}
+        <section className="relative mb-10 overflow-hidden rounded-3xl bg-[#245C40] px-6 py-9 text-white shadow-lg shadow-green-950/10 sm:px-10 sm:py-12">
+
+          <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full border border-white/10" />
+
+          <div className="absolute -bottom-40 right-40 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
+
+          <div className="relative z-10 flex flex-col justify-between gap-8 md:flex-row md:items-center">
+
+            <div className="max-w-2xl">
+
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-green-100">
+                <Sparkles size={14} />
+                ORGANIZER DASHBOARD
+              </div>
+
+              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+                Manage Your Events
+              </h1>
+
+              <p className="mt-4 max-w-xl text-sm leading-7 text-green-100 sm:text-base">
+                Every event creates an opportunity to make a
+                difference. Manage your initiatives and inspire
+                your community to take action.
+              </p>
+
             </div>
-
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#263b30] md:text-4xl">
-              Manage My Events
-            </h1>
-
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#718077]">
-              View and manage the social initiatives you have published.
-              Track your events and make a difference in your community.
-            </p>
-          </div>
-
-          {/* Create Event Button */}
-          <Link
-            href="/create-event"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#34765a] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#285c45]"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create New Event
-          </Link>
-        </div>
-
-        {/* Event Statistics */}
-        <div className="mb-8 flex items-center gap-4 rounded-2xl border border-[#e7eee8] bg-white p-5 shadow-sm">
-          <div className="rounded-xl bg-[#eaf3ec] p-3">
-            <CalendarCheck className="h-7 w-7 text-[#34765a]" />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-[#718077]">
-              Total Published Events
-            </p>
-
-            <h2 className="text-2xl font-extrabold text-[#263b30]">
-              {events.length}
-            </h2>
-          </div>
-        </div>
-
-        {/* Events Heading */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-[#263b30]">
-            My Published Events
-          </h2>
-
-          <p className="mt-1 text-sm text-[#718077]">
-            All events created by you
-          </p>
-        </div>
-
-        {/* Empty State */}
-        {events.length === 0 ? (
-          <div className="flex min-h-[350px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#cbd9ce] bg-white px-5 text-center">
-            <div className="mb-5 rounded-full bg-[#eaf3ec] p-5">
-              <HeartHandshake className="h-12 w-12 text-[#34765a]" />
-            </div>
-
-            <h2 className="text-xl font-bold text-[#263b30]">
-              No Events Created Yet
-            </h2>
-
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#718077]">
-              You haven&apos;t published any events yet. Start your first
-              community initiative and inspire others to make a difference.
-            </p>
 
             <Link
               href="/create-event"
-              className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#34765a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#285c45]"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#245C40] shadow-md transition hover:-translate-y-1 hover:bg-green-50"
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create Your First Event
+              <Plus size={19} />
+              Create New Event
+              <ArrowUpRight size={16} />
             </Link>
+
           </div>
-        ) : (
+        </section>
 
-          /* Event Cards */
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <Card
-                key={event._id}
-                className="group overflow-hidden rounded-2xl border border-[#e5ece6] bg-white p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        {/* Statistics */}
+        <section className="mb-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
+
+          {/* Total Events */}
+          <div className="rounded-3xl border border-[#34765A]/10 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+
+            <div className="flex items-center justify-between">
+              <div className="rounded-2xl bg-[#E5F0E6] p-3">
+                <FolderOpen className="h-6 w-6 text-[#34765A]" />
+              </div>
+
+              <span className="text-xs font-bold tracking-wider text-[#91A096]">
+                ALL TIME
+              </span>
+            </div>
+
+            <p className="mt-5 text-sm font-medium text-[#718579]">
+              Total Published Events
+            </p>
+
+            <h2 className="mt-1 text-3xl font-extrabold text-[#263B30]">
+              {events.length}
+            </h2>
+
+          </div>
+
+          {/* Upcoming Events */}
+          <div className="rounded-3xl border border-[#34765A]/10 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+
+            <div className="flex items-center justify-between">
+              <div className="rounded-2xl bg-blue-50 p-3">
+                <CalendarClock className="h-6 w-6 text-blue-600" />
+              </div>
+
+              <span className="text-xs font-bold tracking-wider text-blue-500">
+                ACTIVE
+              </span>
+            </div>
+
+            <p className="mt-5 text-sm font-medium text-[#718579]">
+              Upcoming Events
+            </p>
+
+            <h2 className="mt-1 text-3xl font-extrabold text-[#263B30]">
+              {upcomingEvents.length}
+            </h2>
+
+          </div>
+
+          {/* Past Events */}
+          <div className="rounded-3xl border border-[#34765A]/10 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+
+            <div className="flex items-center justify-between">
+              <div className="rounded-2xl bg-orange-50 p-3">
+                <History className="h-6 w-6 text-orange-500" />
+              </div>
+
+              <span className="text-xs font-bold tracking-wider text-orange-500">
+                COMPLETED
+              </span>
+            </div>
+
+            <p className="mt-5 text-sm font-medium text-[#718579]">
+              Past Events
+            </p>
+
+            <h2 className="mt-1 text-3xl font-extrabold text-[#263B30]">
+              {pastEvents.length}
+            </h2>
+
+          </div>
+
+        </section>
+
+        {/* Events Section Header */}
+        <section>
+
+          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#34765A]">
+                <Settings2 size={16} />
+                EVENT MANAGEMENT
+              </div>
+
+              <h2 className="text-2xl font-extrabold text-[#263B30] sm:text-3xl">
+                My Published Events
+              </h2>
+
+              <p className="mt-2 text-sm text-[#718579]">
+                Manage and track all the events you have created.
+              </p>
+            </div>
+
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#34765A]/15 bg-white px-4 py-2 text-xs font-semibold text-[#64756B] shadow-sm">
+              <CalendarCheck size={15} className="text-[#34765A]" />
+              {events.length} {events.length === 1 ? "Event" : "Events"}
+            </div>
+
+          </div>
+
+          {/* Empty State */}
+          {events.length === 0 ? (
+
+            <div className="rounded-3xl border border-dashed border-[#34765A]/25 bg-white px-5 py-20 text-center shadow-sm">
+
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[#E5F0E6]">
+                <HeartHandshake className="h-10 w-10 text-[#34765A]" />
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-[#263B30]">
+                Your journey starts here!
+              </h3>
+
+              <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-[#718579]">
+                You haven&apos;t published any events yet. Create
+                your first community initiative and invite others
+                to make a positive difference.
+              </p>
+
+              <Link
+                href="/create-event"
+                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#34765A] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#285C45]"
               >
-                {/* Event Image */}
-                <div className="relative h-48 w-full overflow-hidden bg-[#edf3ed]">
-                  {event.imageUrl ? (
-                    <Image
-                      src={event.imageUrl}
-                      alt={event.eventTitle}
-                      fill
-                      unoptimized
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <HeartHandshake className="h-14 w-14 text-[#b8c9bc]" />
+                <Plus size={18} />
+                Create Your First Event
+              </Link>
+
+            </div>
+
+          ) : (
+
+            /* Modern Event Cards */
+            <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+
+              {events.map((event) => (
+
+                <Card
+                  key={event._id}
+                  className="group overflow-hidden rounded-3xl border border-[#34765A]/10 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#34765A]/20 hover:shadow-xl hover:shadow-green-900/10"
+                >
+
+                  {/* Event Image */}
+                  <div className="relative h-56 overflow-hidden rounded-2xl bg-[#E5F0E6]">
+
+                    {event.imageUrl ? (
+
+                      <Image
+                        src={event.imageUrl}
+                        alt={event.eventTitle}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+
+                    ) : (
+
+                      <div className="flex h-full items-center justify-center text-[#83A08C]">
+                        <HeartHandshake size={56} />
+                      </div>
+
+                    )}
+
+                    {/* Image Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#142D21]/65 via-transparent to-black/10" />
+
+                    {/* Event Type Badge */}
+                    <div className="absolute left-4 top-4">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-[#34765A] shadow-sm backdrop-blur-md">
+                        <Heart size={13} />
+                        {event.eventType}
+                      </span>
                     </div>
-                  )}
 
-                  {/* Event Type */}
-                  <span className="absolute left-3 top-3 rounded-full bg-[#edf6ee]/95 px-3 py-1.5 text-xs font-semibold text-[#34765a] shadow-sm">
-                    {event.eventType}
-                  </span>
+                    {/* Event Date Badge */}
+                    <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-white shadow-sm backdrop-blur-md">
+                      <CalendarDays size={15} />
+                      <span className="text-xs font-semibold">
+                        {formatDate(event.eventDate)}
+                      </span>
+                    </div>
 
-                  {/* Event Date */}
-                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg bg-[#263b30]/85 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm">
-                    <CalendarDays size={14} />
+                    {/* Hover Arrow */}
+                    <div className="absolute bottom-4 right-4 flex h-10 w-10 translate-y-3 items-center justify-center rounded-full bg-white text-[#34765A] opacity-0 shadow-lg transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <ArrowUpRight size={18} />
+                    </div>
 
-                    {new Date(
-                      `${event.eventDate}T00:00:00`
-                    ).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </div>
-                </div>
-
-                {/* Event Information */}
-                <div className="p-5">
-                  <h3 className="line-clamp-1 text-lg font-bold text-[#34765a]">
-                    {event.eventTitle}
-                  </h3>
-
-                  {/* Location */}
-                  <div className="mt-3 flex items-center gap-2 text-sm text-[#718077]">
-                    <MapPin
-                      size={15}
-                      className="shrink-0 text-[#34765a]"
-                    />
-
-                    <span className="line-clamp-1">
-                      {event.location}
-                    </span>
                   </div>
 
-                  {/* Description */}
-                  <p className="mt-3 line-clamp-2 min-h-10 text-sm leading-6 text-[#718077]">
-                    {event.description}
-                  </p>
+                  {/* Card Content */}
+                  <div className="px-2 pb-2 pt-5">
 
-                  {/* Organizer */}
-                  <div className="mt-4 border-t border-[#edf1ed] pt-4">
-                    <p className="mb-4 truncate text-xs text-[#91a096]">
-                      Organizer: {event.creatorEmail}
+                    <h3 className="line-clamp-2 min-h-14 text-xl font-extrabold text-[#263B30] transition-colors duration-300 group-hover:text-[#34765A]">
+                      {event.eventTitle}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#718579]">
+                      {event.description}
                     </p>
 
-                    {/* Only View Details Button */}
-                    <Link
-                      href={`/events/${event._id}`}
-                      className="inline-flex w-full items-center justify-center rounded-lg border border-[#d8e8dc] bg-[#edf6ee] px-4 py-2.5 text-sm font-semibold text-[#34765a] transition hover:border-[#34765a] hover:bg-[#34765a] hover:text-white"
-                    >
-                      <Eye size={16} className="mr-2" />
-                      View Details
-                    </Link>
+                    {/* Location */}
+                    <div className="mt-4 flex items-center gap-2 text-sm text-[#718579]">
+
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E5F0E6] text-[#34765A]">
+                        <MapPin size={16} />
+                      </span>
+
+                      <span className="line-clamp-1">
+                        {event.location}
+                      </span>
+
+                    </div>
+
+                    {/* Organizer */}
+                    <div className="mt-4 border-t border-[#34765A]/10 pt-4">
+
+                      <p className="mb-4 truncate text-xs text-[#91A096]">
+                        Organizer: {event.creatorEmail}
+                      </p>
+
+                      {/* View Details */}
+                      <Link
+                        href={`/events/${event._id}`}
+                        className="block"
+                      >
+                        <button
+                          type="button"
+                          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#34765A] px-4 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#285C45]"
+                        >
+                          <Eye size={17} />
+                          View Details
+                          <ArrowUpRight
+                            size={16}
+                            className="ml-auto transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                          />
+                        </button>
+                      </Link>
+
+                    </div>
+
                   </div>
-                </div>
-              </Card>
-            ))}
+
+                </Card>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </section>
+
+        {/* Bottom Message */}
+        {events.length > 0 && (
+          <div className="mt-12 flex flex-col items-center justify-center gap-2 text-center">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#34765A]">
+              <Heart size={16} fill="currentColor" />
+              Every event makes a difference.
+            </div>
+
+            <p className="text-xs text-[#718579]">
+              Keep inspiring your community through meaningful actions.
+            </p>
           </div>
         )}
+
       </div>
     </main>
   );

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -12,6 +11,9 @@ import {
   Loader2,
   Search,
   PlusCircle,
+  Sparkles,
+  Heart,
+  ArrowRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -52,6 +54,7 @@ const UpcomingEventsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch Upcoming Events
   useEffect(() => {
     let cancelled = false;
 
@@ -75,9 +78,7 @@ const UpcomingEventsPage = () => {
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(
-            result.message || "Failed to load events"
-          );
+          throw new Error(result.message || "Failed to load events");
         }
 
         if (!cancelled) {
@@ -126,22 +127,24 @@ const UpcomingEventsPage = () => {
     });
   }, [events, selectedCategory, searchTerm]);
 
+  // Format Date
   const formatDate = (date: string) => {
     return new Date(
       `${date.slice(0, 10)}T00:00:00`
     ).toLocaleDateString("en-GB", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     });
   };
 
+  // Loading State
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f8faf7]">
-        <div className="flex items-center gap-2 text-[#34765a]">
-          <Loader2 className="animate-spin" size={22} />
-          <span className="text-sm font-medium">
+      <main className="flex min-h-screen items-center justify-center bg-[#F1F7F1]">
+        <div className="flex items-center gap-3 text-[#34765A]">
+          <Loader2 className="animate-spin" size={24} />
+          <span className="text-sm font-semibold">
             Loading upcoming events...
           </span>
         </div>
@@ -150,43 +153,50 @@ const UpcomingEventsPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8faf7] px-4 py-10 sm:py-12">
-      <div className="mx-auto max-w-6xl">
+    <main className="relative min-h-screen overflow-hidden bg-[#F1F7F1] px-4 py-12 sm:py-16">
+
+      {/* Background Decorations */}
+      <div className="pointer-events-none absolute -left-40 top-40 h-80 w-80 rounded-full bg-emerald-200/30 blur-[100px]" />
+      <div className="pointer-events-none absolute -right-40 bottom-20 h-96 w-96 rounded-full bg-lime-200/30 blur-[100px]" />
+
+      <div className="relative mx-auto max-w-7xl">
 
         {/* Page Heading */}
-        <div className="border-b border-[#e5ece6] pb-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col justify-between gap-7 border-b border-[#34765A]/15 pb-9 md:flex-row md:items-end">
 
-            <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#eaf3ec] px-3 py-1.5 text-xs font-semibold text-[#34765a]">
-                <CalendarDays size={14} />
-                Future Community Drives
-              </div>
+          <div className="max-w-2xl">
 
-              <h1 className="text-3xl font-extrabold tracking-tight text-[#263b30] sm:text-4xl">
-                Upcoming Events
-              </h1>
-
-              <p className="mt-3 max-w-xl text-sm leading-6 text-[#718077]">
-                Discover verified volunteer initiatives scheduled
-                for upcoming dates. Past events are automatically
-                excluded so you can focus on active drives that
-                need support.
-              </p>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#34765A]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[2px] text-[#34765A] shadow-sm">
+              <Sparkles size={15} />
+              Future Community Drives
             </div>
 
-            <Link href="/create-event">
-              <Button className="h-11 w-full rounded-xl bg-[#0d9488] px-5 font-semibold text-white shadow-sm transition hover:bg-[#0f766e] sm:w-auto">
-                <PlusCircle size={17} className="mr-2" />
-                Create Event
-              </Button>
-            </Link>
+            <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[#263B30] sm:text-4xl md:text-5xl">
+              Discover Our
+              <span className="block text-[#34765A]">
+                Upcoming Events
+              </span>
+            </h1>
+
+            <p className="mt-4 max-w-xl text-sm leading-7 text-[#718579] sm:text-base">
+              Discover meaningful community initiatives, connect
+              with compassionate people and become part of
+              something that creates a positive impact.
+            </p>
 
           </div>
+
+          <Link href="/create-event" className="w-full sm:w-fit">
+            <Button className="h-12 w-full rounded-full bg-[#34765A] px-7 font-bold text-white shadow-lg shadow-green-900/10 transition-all duration-300 hover:-translate-y-1 hover:bg-[#285C45] sm:w-auto">
+              <PlusCircle size={18} className="mr-2" />
+              Create Event
+            </Button>
+          </Link>
+
         </div>
 
         {/* Category Tabs and Search */}
-        <div className="flex flex-col gap-4 py-7 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-5 py-8 lg:flex-row lg:items-center lg:justify-between">
 
           {/* Category Tabs */}
           <Tabs
@@ -194,12 +204,12 @@ const UpcomingEventsPage = () => {
             onValueChange={setSelectedCategory}
             className="w-full lg:w-auto"
           >
-            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-transparent p-0 lg:w-auto">
+            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0 lg:w-auto">
               {categories.map((category) => (
                 <TabsTrigger
                   key={category}
                   value={category}
-                  className="rounded-full border border-[#e5ece6] bg-white px-3.5 py-2 text-xs font-semibold text-[#66756c] shadow-none transition data-[state=active]:border-[#0d9488] data-[state=active]:bg-[#0d9488] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                  className="rounded-full border border-[#34765A]/15 bg-white px-4 py-2 text-xs font-semibold text-[#607568] shadow-sm transition-all hover:border-[#34765A]/30 data-[state=active]:border-[#34765A] data-[state=active]:bg-[#34765A] data-[state=active]:text-white data-[state=active]:shadow-md"
                 >
                   {category}
                 </TabsTrigger>
@@ -208,10 +218,10 @@ const UpcomingEventsPage = () => {
           </Tabs>
 
           {/* Search Bar */}
-          <div className="relative w-full lg:max-w-64">
+          <div className="relative w-full lg:max-w-72">
             <Search
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#87948b]"
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#83A08C]"
             />
 
             <Input
@@ -219,38 +229,46 @@ const UpcomingEventsPage = () => {
               placeholder="Search events or areas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-11 rounded-xl border-[#e1e9e2] bg-white pl-10 text-sm shadow-sm placeholder:text-[#9aa59e] focus-visible:ring-[#34765a]"
+              className="h-12 rounded-full border-[#34765A]/15 bg-white pl-11 text-sm shadow-sm placeholder:text-[#9AA99E] focus-visible:ring-[#34765A]"
             />
           </div>
 
         </div>
 
         {/* Results Count */}
-        <div className="mb-5 flex items-center justify-between">
-          <p className="text-sm text-[#718077]">
-            Showing{" "}
-            <span className="font-semibold text-[#263b30]">
-              {filteredEvents.length}
-            </span>{" "}
-            {filteredEvents.length === 1 ? "event" : "events"}
-          </p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-[#263B30]">
+              Explore Community Events
+            </h2>
+            <p className="mt-1 text-sm text-[#718579]">
+              Find an opportunity to make a difference.
+            </p>
+          </div>
+
+          <span className="rounded-full border border-[#34765A]/15 bg-white px-4 py-2 text-xs font-bold text-[#34765A] shadow-sm">
+            {filteredEvents.length}{" "}
+            {filteredEvents.length === 1 ? "Event" : "Events"} Found
+          </span>
         </div>
 
-        {/* Events */}
+        {/* Empty State */}
         {filteredEvents.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-[#e5ece6] bg-white px-5 py-16 text-center">
+          <div className="rounded-3xl border border-dashed border-[#34765A]/25 bg-white/80 px-5 py-20 text-center shadow-sm">
 
-            <HeartHandshake className="mx-auto h-12 w-12 text-[#b8c9bc]" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E5F0E6] text-[#34765A]">
+              <HeartHandshake size={30} />
+            </div>
 
-            <h2 className="mt-4 text-xl font-bold text-[#263b30]">
+            <h2 className="mt-5 text-xl font-bold text-[#263B30]">
               {events.length === 0
                 ? "No Upcoming Events"
                 : "No Events Found"}
             </h2>
 
-            <p className="mt-2 text-sm text-[#718077]">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-[#718579]">
               {events.length === 0
-                ? "There are no upcoming events right now."
+                ? "There are no upcoming events right now. Please check back later."
                 : "Try another category or search with a different keyword."}
             </p>
 
@@ -261,7 +279,7 @@ const UpcomingEventsPage = () => {
                   setSelectedCategory("All");
                   setSearchTerm("");
                 }}
-                className="mt-5 rounded-xl border-[#34765a] text-[#34765a] hover:bg-[#eaf3ec]"
+                className="mt-6 rounded-full border-[#34765A] px-6 text-[#34765A] hover:bg-[#E5F0E6]"
               >
                 Clear Filters
               </Button>
@@ -269,16 +287,18 @@ const UpcomingEventsPage = () => {
 
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+          /* Event Cards */
+          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
 
             {filteredEvents.map((event) => (
               <Card
                 key={event._id}
-                className="overflow-hidden rounded-2xl border border-[#e5ece6] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group overflow-hidden rounded-3xl border border-[#34765A]/10 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#34765A]/20 hover:shadow-xl hover:shadow-green-900/10"
               >
 
                 {/* Event Image */}
-                <div className="relative h-52 w-full bg-[#edf3ed]">
+                <div className="relative h-56 overflow-hidden rounded-2xl bg-[#E5F0E6]">
 
                   {event.imageUrl ? (
                     <Image
@@ -287,58 +307,73 @@ const UpcomingEventsPage = () => {
                       fill
                       unoptimized
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <HeartHandshake className="h-14 w-14 text-[#b8c9bc]" />
+                    <div className="flex h-full items-center justify-center text-[#83A08C]">
+                      <HeartHandshake size={56} />
                     </div>
                   )}
 
-                  <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#34765a] shadow-sm">
-                    {event.eventType}
-                  </span>
+                  {/* Image Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#142D21]/65 via-transparent to-black/10" />
+
+                  {/* Event Type Badge */}
+                  <div className="absolute left-4 top-4">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-[#34765A] shadow-sm backdrop-blur-md">
+                      <Heart size={13} />
+                      {event.eventType}
+                    </span>
+                  </div>
+
+                  {/* Date Badge */}
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-white shadow-sm backdrop-blur-md">
+                    <CalendarDays size={15} />
+                    <span className="text-xs font-semibold">
+                      {formatDate(event.eventDate)}
+                    </span>
+                  </div>
+
+                  {/* Hover Arrow */}
+                  <div className="absolute bottom-4 right-4 flex h-10 w-10 translate-y-3 items-center justify-center rounded-full bg-white text-[#34765A] opacity-0 shadow-lg transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                    <ArrowRight size={18} />
+                  </div>
 
                 </div>
 
-                <CardContent className="p-5">
+                {/* Card Content */}
+                <CardContent className="px-2 pb-2 pt-5">
 
-                  <h2 className="line-clamp-2 text-xl font-bold text-[#263b30]">
+                  <h2 className="line-clamp-2 min-h-14 text-xl font-extrabold text-[#263B30] transition-colors duration-300 group-hover:text-[#34765A]">
                     {event.eventTitle}
                   </h2>
 
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#718077]">
+                  <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#718579]">
                     {event.description}
                   </p>
 
-                  <div className="mt-5 space-y-3 border-t border-[#e5ece6] pt-4">
+                  {/* Location */}
+                  <div className="mt-4 flex items-center gap-2 text-sm text-[#718579]">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E5F0E6] text-[#34765A]">
+                      <MapPin size={16} />
+                    </span>
 
-                    <div className="flex items-center gap-2 text-sm text-[#718077]">
-                      <CalendarDays
-                        size={17}
-                        className="shrink-0 text-[#34765a]"
-                      />
-                      {formatDate(event.eventDate)}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-[#718077]">
-                      <MapPin
-                        size={17}
-                        className="shrink-0 text-[#34765a]"
-                      />
-                      <span className="line-clamp-1">
-                        {event.location}
-                      </span>
-                    </div>
-
+                    <span className="line-clamp-1">
+                      {event.location}
+                    </span>
                   </div>
 
+                  {/* View Event Button */}
                   <Link
                     href={`/events/${event._id}`}
                     className="mt-5 block"
                   >
-                    <Button className="w-full rounded-xl bg-[#34765a] text-white hover:bg-[#285c45]">
+                    <Button className="h-11 w-full rounded-xl bg-[#34765A] font-semibold text-white transition-all duration-300 hover:bg-[#285C45]">
                       View Event
+                      <ArrowRight
+                        size={17}
+                        className="ml-2 transition-transform group-hover:translate-x-1"
+                      />
                     </Button>
                   </Link>
 
@@ -346,6 +381,20 @@ const UpcomingEventsPage = () => {
               </Card>
             ))}
 
+          </div>
+        )}
+
+        {/* Bottom Message */}
+        {filteredEvents.length > 0 && (
+          <div className="mt-12 flex flex-col items-center justify-center gap-2 text-center">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#34765A]">
+              <Heart size={16} fill="currentColor" />
+              Be the reason someone smiles today.
+            </div>
+
+            <p className="text-xs text-[#718579]">
+              Every small action can create a meaningful change.
+            </p>
           </div>
         )}
 

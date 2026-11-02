@@ -1,9 +1,10 @@
+
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import {
@@ -16,6 +17,9 @@ import {
   LogIn,
   LogOut,
   ChevronDown,
+  Home,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -45,14 +49,15 @@ type ProfileMenuProps = {
     image?: string | null;
   };
   handleLogout: () => void;
-  router: ReturnType<typeof useRouter>;
+  isLoggingOut: boolean;
 };
 
 function ProfileMenu({
   user,
   handleLogout,
-  router,
+  isLoggingOut,
 }: ProfileMenuProps) {
+  const router = useRouter();
   const [imageError, setImageError] = useState(false);
 
   const userName = user.name || "KindNest User";
@@ -63,8 +68,8 @@ function ProfileMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 rounded-full border border-green-100 p-1.5 transition hover:bg-green-50">
-        <Avatar className="h-10 w-10 border-2 border-green-200">
+      <DropdownMenuTrigger className="group flex items-center gap-2 rounded-full border border-green-100 bg-white p-1.5 pr-3 shadow-sm transition-all duration-300 hover:border-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-200">
+        <Avatar className="h-10 w-10 border-2 border-green-100">
           {profileImage && (
             <AvatarImage
               src={profileImage}
@@ -73,20 +78,35 @@ function ProfileMenu({
               onError={() => setImageError(true)}
             />
           )}
-
           <AvatarFallback className="bg-green-100 font-bold text-green-800">
             {userInitial}
           </AvatarFallback>
         </Avatar>
 
-        <ChevronDown size={16} className="mr-1 text-green-800" />
+        <div className="hidden max-w-28 text-left sm:block">
+          <p className="truncate text-sm font-bold text-green-950">
+            {userName}
+          </p>
+          <p className="text-[10px] font-medium text-green-600">
+            My Account
+          </p>
+        </div>
+
+        <ChevronDown
+          size={16}
+          className="text-green-700 transition-transform duration-200 group-data-[state=open]:rotate-180"
+        />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-64 rounded-xl p-2">
+      <DropdownMenuContent
+        align="end"
+        sideOffset={12}
+        className="w-72 rounded-2xl border border-green-100 bg-white p-2 shadow-xl"
+      >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="p-3">
             <div className="flex items-center gap-3">
-              <Avatar className="h-11 w-11">
+              <Avatar className="h-12 w-12 border-2 border-green-100">
                 {profileImage && (
                   <AvatarImage
                     src={profileImage}
@@ -95,59 +115,89 @@ function ProfileMenu({
                     onError={() => setImageError(true)}
                   />
                 )}
-
-                <AvatarFallback className="bg-green-100 font-bold text-green-800">
+                <AvatarFallback className="bg-green-100 text-lg font-bold text-green-800">
                   {userInitial}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex min-w-0 flex-col gap-1">
-                <span className="truncate font-semibold text-green-900">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-green-950">
                   {userName}
-                </span>
-
-                <span className="truncate text-xs font-normal text-gray-500">
+                </p>
+                <p className="truncate text-xs font-normal text-gray-500">
                   {user.email}
+                </p>
+                <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-green-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  Active Account
                 </span>
               </div>
             </div>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-green-100" />
+
+        <div className="px-2 py-2 text-[10px] font-bold uppercase tracking-[1.5px] text-gray-400">
+          Event Management
+        </div>
 
         <DropdownMenuItem
           onClick={() => router.push("/create-event")}
-          className="cursor-pointer gap-3 py-3"
+          className="cursor-pointer gap-3 rounded-xl px-3 py-3 focus:bg-green-50"
         >
-          <PlusCircle size={18} className="text-green-700" />
-          Create Event
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-700">
+            <PlusCircle size={18} />
+          </span>
+          <div>
+            <p className="font-semibold text-gray-800">Create Event</p>
+            <p className="text-[11px] text-gray-500">
+              Organize a new event
+            </p>
+          </div>
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/manage-events")}
-          className="cursor-pointer gap-3 py-3"
+          className="cursor-pointer gap-3 rounded-xl px-3 py-3 focus:bg-green-50"
         >
-          <LayoutDashboard size={18} className="text-green-700" />
-          Manage Events
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <LayoutDashboard size={18} />
+          </span>
+          <div>
+            <p className="font-semibold text-gray-800">Manage Events</p>
+            <p className="text-[11px] text-gray-500">
+              Manage your activities
+            </p>
+          </div>
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/joined-events")}
-          className="cursor-pointer gap-3 py-3"
+          className="cursor-pointer gap-3 rounded-xl px-3 py-3 focus:bg-green-50"
         >
-          <Heart size={18} className="text-green-700" />
-          Joined Events
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
+            <Heart size={18} />
+          </span>
+          <div>
+            <p className="font-semibold text-gray-800">Joined Events</p>
+            <p className="text-[11px] text-gray-500">
+              Events you have joined
+            </p>
+          </div>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-green-100" />
 
         <DropdownMenuItem
           onClick={handleLogout}
-          className="cursor-pointer gap-3 py-3 text-red-600 focus:bg-red-50 focus:text-red-600"
+          disabled={isLoggingOut}
+          className="cursor-pointer gap-3 rounded-xl px-3 py-3 text-red-600 focus:bg-red-50 focus:text-red-600"
         >
           <LogOut size={18} />
-          Logout
+          <span className="font-semibold">
+            {isLoggingOut ? "Logging out..." : "Logout"}
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -159,14 +209,15 @@ export default function Navbar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const { data: session, isPending } = authClient.useSession();
-
   const user = session?.user;
 
   const closeMenu = () => setIsOpen(false);
 
-  // Logout Function
+  const isActive = (path: string) => pathname === path;
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
 
@@ -181,7 +232,6 @@ export default function Navbar() {
       }
 
       closeMenu();
-
       toast.success("Logged out successfully!");
 
       router.push("/login");
@@ -194,85 +244,134 @@ export default function Navbar() {
     }
   };
 
+  const navLinks = [
+    {
+      name: "Home",
+      href: "/",
+      icon: Home,
+    },
+    {
+      name: "Upcoming Events",
+      href: "/upcoming-events",
+      icon: CalendarDays,
+    },
+  ];
+
   return (
-    <section className="sticky top-0 z-50 border-b border-green-100 bg-white/95 shadow-sm backdrop-blur-md">
-      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-green-100/80 bg-white/90 shadow-[0_4px_25px_rgba(31,78,53,0.05)] backdrop-blur-xl">
+      <nav className="mx-auto flex h-19 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="mr-3 rounded-xl border border-green-100 p-2 text-green-900 hover:bg-green-50 md:hidden"
+          className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl border border-green-100 text-green-900 transition hover:bg-green-50 md:hidden"
           aria-label="Toggle navigation"
+          aria-expanded={isOpen}
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? <X size={21} /> : <Menu size={21} />}
         </button>
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/image/kindnest.jpg"
-            alt="KindNest Logo"
-            width={48}
-            height={48}
-            priority
-            className="h-12 w-12 rounded-xl object-cover"
-          />
+        <Link
+          href="/"
+          onClick={closeMenu}
+          className="group flex shrink-0 items-center gap-2.5"
+        >
+          <div className="relative">
+            <Image
+              src="/image/kindnest.jpg"
+              alt="KindNest Logo"
+              width={46}
+              height={46}
+              priority
+              className="h-11 w-11 rounded-xl object-cover shadow-sm transition duration-300 group-hover:rotate-[-5deg] group-hover:scale-105"
+            />
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-lime-400">
+              <Sparkles size={8} className="text-green-900" />
+            </span>
+          </div>
 
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-green-900">
-              KindNest <span className="text-lime-500">.</span>
+            <h1 className="text-[22px] font-extrabold leading-none tracking-tight text-green-950 sm:text-2xl">
+              KindNest<span className="text-lime-500">.</span>
             </h1>
-
-            <p className="text-[10px] font-semibold tracking-[2px] text-gray-500">
+            <p className="mt-1 text-[9px] font-bold tracking-[2.5px] text-green-700">
               SPREAD KINDNESS
             </p>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center gap-8 md:flex">
-          <Link
-            href="/upcoming-events"
-            className="font-medium text-gray-700 transition hover:text-green-700"
-          >
-            Upcoming Events
-          </Link>
+        <div className="hidden items-center gap-2 md:flex">
+          {navLinks.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  active
+                    ? "bg-green-100 text-green-800"
+                    : "text-gray-600 hover:bg-green-50 hover:text-green-800"
+                }`}
+              >
+                <Icon size={17} />
+                {item.name}
+
+                {active && (
+                  <span className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-green-600" />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Desktop Profile / Login */}
-        <div className="hidden items-center gap-4 md:flex">
+        {/* Desktop Authentication */}
+        <div className="hidden items-center gap-3 md:flex">
           {isPending ? (
-            <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
+            <div className="h-10 w-28 animate-pulse rounded-full bg-green-50" />
           ) : user ? (
             <ProfileMenu
               user={user}
               handleLogout={handleLogout}
-              router={router}
+              isLoggingOut={isLoggingOut}
             />
           ) : (
-            <Link
-              href="/login"
-              className="flex items-center rounded-full bg-green-800 px-7 py-3 font-semibold text-white hover:bg-green-900"
-            >
-              <LogIn size={17} className="mr-2" />
-              Login
-            </Link>
+            <>
+              <Link
+                href="/signUp"
+                className="px-4 py-2 text-sm font-semibold text-green-800 transition hover:text-green-600"
+              >
+                Sign Up
+              </Link>
+
+              <Link
+                href="/login"
+                className="flex items-center gap-2 rounded-full bg-green-800 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-green-800/15 transition-all hover:-translate-y-0.5 hover:bg-green-900 hover:shadow-lg"
+              >
+                <LogIn size={17} />
+                Login
+                <ArrowUpRight size={15} />
+              </Link>
+            </>
           )}
         </div>
 
-        {/* Mobile Profile */}
-        <div className="ml-auto md:hidden">
+        {/* Mobile Authentication */}
+        <div className="ml-auto flex items-center md:hidden">
           {!isPending &&
             (user ? (
               <ProfileMenu
                 user={user}
                 handleLogout={handleLogout}
-                router={router}
+                isLoggingOut={isLoggingOut}
               />
             ) : (
               <Link
                 href="/login"
-                className="rounded-full bg-green-800 px-5 py-2 text-sm font-semibold text-white hover:bg-green-900"
+                className="rounded-full bg-green-800 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-green-900"
               >
                 Login
               </Link>
@@ -282,58 +381,74 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="border-t border-green-100 bg-white px-5 py-5 shadow-lg md:hidden">
+        <div className="animate-in slide-in-from-top-2 border-t border-green-100 bg-white px-4 py-5 shadow-xl duration-200 md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-2">
 
-            <Link
-              href="/"
-              onClick={closeMenu}
-              className="rounded-lg px-4 py-3 font-medium text-gray-700 hover:bg-green-50"
-            >
-              Home
-            </Link>
+            <div className="mb-2 rounded-2xl bg-linear-to-r from-green-50 to-lime-50 p-4">
+              <div className="flex items-center gap-2 text-green-800">
+                <Heart size={18} />
+                <p className="text-sm font-bold">
+                  Small acts, big changes.
+                </p>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Be part of something meaningful.
+              </p>
+            </div>
 
-            <Link
-              href="/upcoming-events"
-              onClick={closeMenu}
-              className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-gray-700 hover:bg-green-50"
-            >
-              <CalendarDays size={18} />
-              Upcoming Events
-            </Link>
+            {navLinks.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
 
-            {user && (
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    active
+                      ? "bg-green-100 text-green-800"
+                      : "text-gray-700 hover:bg-green-50"
+                  }`}
+                >
+                  <Icon size={19} />
+                  {item.name}
+                </Link>
+              );
+            })}
+
+            {user ? (
               <>
-                <div className="my-2 border-t border-gray-100" />
+                <div className="my-2 border-t border-green-100" />
 
-                <p className="px-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <p className="px-4 py-1 text-[10px] font-bold uppercase tracking-[2px] text-gray-400">
                   My Account
                 </p>
 
                 <Link
                   href="/create-event"
                   onClick={closeMenu}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-green-50"
                 >
-                  <PlusCircle size={18} />
+                  <PlusCircle size={19} className="text-green-700" />
                   Create Event
                 </Link>
 
                 <Link
                   href="/manage-events"
                   onClick={closeMenu}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-green-50"
                 >
-                  <LayoutDashboard size={18} />
+                  <LayoutDashboard size={19} className="text-blue-600" />
                   Manage Events
                 </Link>
 
                 <Link
                   href="/joined-events"
                   onClick={closeMenu}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-green-50"
                 >
-                  <Heart size={18} />
+                  <Heart size={19} className="text-rose-600" />
                   Joined Events
                 </Link>
 
@@ -341,16 +456,35 @@ export default function Navbar() {
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                   variant="ghost"
-                  className="justify-start gap-3 px-4 text-red-600 hover:bg-red-50 hover:text-red-600"
+                  className="mt-1 h-11 justify-start gap-3 rounded-xl px-4 text-sm font-semibold text-red-600 hover:bg-red-50 hover:text-red-600"
                 >
-                  <LogOut size={18} />
+                  <LogOut size={19} />
                   {isLoggingOut ? "Logging out..." : "Logout"}
                 </Button>
               </>
+            ) : (
+              <div className="mt-2 grid grid-cols-2 gap-3">
+                <Link
+                  href="/signUp"
+                  onClick={closeMenu}
+                  className="flex items-center justify-center rounded-xl border border-green-200 py-3 text-sm font-bold text-green-800 transition hover:bg-green-50"
+                >
+                  Sign Up
+                </Link>
+
+                <Link
+                  href="/login"
+                  onClick={closeMenu}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-green-800 py-3 text-sm font-bold text-white transition hover:bg-green-900"
+                >
+                  <LogIn size={16} />
+                  Login
+                </Link>
+              </div>
             )}
           </div>
         </div>
       )}
-    </section>
+    </header>
   );
 }
