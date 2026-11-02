@@ -432,7 +432,7 @@ export default function JoinedEventsPage() {
                     )}
 
                     {/* Image Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#142D21]/65 via-transparent to-black/10" />
+                    <div className="absolute inset-0 bg-linear-to-t from-[#142D21]/65 via-transparent to-black/10" />
 
                     {/* Event Type Badge */}
                     <div className="absolute left-4 top-4">

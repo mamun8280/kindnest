@@ -17,7 +17,6 @@ import {
   LogIn,
   LogOut,
   ChevronDown,
-  Home,
   Sparkles,
   ArrowUpRight,
 } from "lucide-react";
@@ -245,11 +244,7 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    {
-      name: "Home",
-      href: "/",
-      icon: Home,
-    },
+  
     {
       name: "Upcoming Events",
       href: "/upcoming-events",
@@ -340,13 +335,7 @@ export default function Navbar() {
             />
           ) : (
             <>
-              <Link
-                href="/signUp"
-                className="px-4 py-2 text-sm font-semibold text-green-800 transition hover:text-green-600"
-              >
-                Sign Up
-              </Link>
-
+             
               <Link
                 href="/login"
                 className="flex items-center gap-2 rounded-full bg-green-800 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-green-800/15 transition-all hover:-translate-y-0.5 hover:bg-green-900 hover:shadow-lg"

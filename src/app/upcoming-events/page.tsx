@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -19,11 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EventData {
   _id: string;
@@ -129,13 +126,14 @@ const UpcomingEventsPage = () => {
 
   // Format Date
   const formatDate = (date: string) => {
-    return new Date(
-      `${date.slice(0, 10)}T00:00:00`
-    ).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(`${date.slice(0, 10)}T00:00:00`).toLocaleDateString(
+      "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
   // Loading State
@@ -157,6 +155,7 @@ const UpcomingEventsPage = () => {
 
       {/* Background Decorations */}
       <div className="pointer-events-none absolute -left-40 top-40 h-80 w-80 rounded-full bg-emerald-200/30 blur-[100px]" />
+
       <div className="pointer-events-none absolute -right-40 bottom-20 h-96 w-96 rounded-full bg-lime-200/30 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl">
@@ -179,9 +178,9 @@ const UpcomingEventsPage = () => {
             </h1>
 
             <p className="mt-4 max-w-xl text-sm leading-7 text-[#718579] sm:text-base">
-              Discover meaningful community initiatives, connect
-              with compassionate people and become part of
-              something that creates a positive impact.
+              Discover meaningful community initiatives, connect with
+              compassionate people and become part of something that creates a
+              positive impact.
             </p>
 
           </div>
@@ -195,30 +194,11 @@ const UpcomingEventsPage = () => {
 
         </div>
 
-        {/* Category Tabs and Search */}
-        <div className="flex flex-col gap-5 py-8 lg:flex-row lg:items-center lg:justify-between">
-
-          {/* Category Tabs */}
-          <Tabs
-            value={selectedCategory}
-            onValueChange={setSelectedCategory}
-            className="w-full lg:w-auto"
-          >
-            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0 lg:w-auto">
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="rounded-full border border-[#34765A]/15 bg-white px-4 py-2 text-xs font-semibold text-[#607568] shadow-sm transition-all hover:border-[#34765A]/30 data-[state=active]:border-[#34765A] data-[state=active]:bg-[#34765A] data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+        {/* Search and Category Filter */}
+        <div className="flex flex-col gap-5 pt-8 pb-10">
 
           {/* Search Bar */}
-          <div className="relative w-full lg:max-w-72">
+          <div className="relative w-full md:max-w-md">
             <Search
               size={18}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-[#83A08C]"
@@ -229,18 +209,61 @@ const UpcomingEventsPage = () => {
               placeholder="Search events or areas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 rounded-full border-[#34765A]/15 bg-white pl-11 text-sm shadow-sm placeholder:text-[#9AA99E] focus-visible:ring-[#34765A]"
+              className="h-11 w-full rounded-full border-[#34765A]/15 bg-white pl-11 text-sm shadow-sm placeholder:text-[#9AA99E] focus-visible:ring-[#34765A]"
             />
           </div>
+
+          {/* Category Tabs */}
+          <Tabs
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+            className="w-full"
+          >
+            <TabsList
+              className="
+                flex h-10 w-full flex-nowrap justify-start gap-2
+                overflow-x-auto overflow-y-hidden
+                bg-transparent p-0 pb-1
+                touch-pan-x overscroll-x-contain
+                scrollbar-none
+                [&::-webkit-scrollbar]:hidden
+                lg:grid lg:h-10 lg:grid-cols-8
+                lg:overflow-visible lg:pb-0
+              "
+            >
+              {categories.map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="
+                    h-10 min-h-10 shrink-0 whitespace-nowrap
+                    rounded-full border border-[#34765A]/15
+                    bg-white px-5 py-2 text-xs font-semibold
+                    text-[#607568] shadow-sm transition-all
+                    hover:border-[#34765A]/30
+                    data-[state=active]:border-[#34765A]
+                    data-[state=active]:bg-[#34765A]
+                    data-[state=active]:text-white
+                    data-[state=active]:shadow-md
+                    lg:min-w-0 lg:w-full lg:px-2
+                  "
+                >
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
 
         </div>
 
         {/* Results Count */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+
           <div>
             <h2 className="text-lg font-bold text-[#263B30]">
               Explore Community Events
             </h2>
+
             <p className="mt-1 text-sm text-[#718579]">
               Find an opportunity to make a difference.
             </p>
@@ -250,10 +273,12 @@ const UpcomingEventsPage = () => {
             {filteredEvents.length}{" "}
             {filteredEvents.length === 1 ? "Event" : "Events"} Found
           </span>
+
         </div>
 
         {/* Empty State */}
         {filteredEvents.length === 0 ? (
+
           <div className="rounded-3xl border border-dashed border-[#34765A]/25 bg-white/80 px-5 py-20 text-center shadow-sm">
 
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E5F0E6] text-[#34765A]">
@@ -286,12 +311,14 @@ const UpcomingEventsPage = () => {
             )}
 
           </div>
+
         ) : (
 
           /* Event Cards */
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
 
             {filteredEvents.map((event) => (
+
               <Card
                 key={event._id}
                 className="group overflow-hidden rounded-3xl border border-[#34765A]/10 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#34765A]/20 hover:shadow-xl hover:shadow-green-900/10"
@@ -316,7 +343,7 @@ const UpcomingEventsPage = () => {
                   )}
 
                   {/* Image Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#142D21]/65 via-transparent to-black/10" />
+                  <div className="absolute inset-0 bg-linear-to-t from-[#142D21]/65 via-transparent to-black/10" />
 
                   {/* Event Type Badge */}
                   <div className="absolute left-4 top-4">
@@ -364,10 +391,7 @@ const UpcomingEventsPage = () => {
                   </div>
 
                   {/* View Event Button */}
-                  <Link
-                    href={`/events/${event._id}`}
-                    className="mt-5 block"
-                  >
+                  <Link href={`/events/${event._id}`} className="mt-5 block">
                     <Button className="h-11 w-full rounded-xl bg-[#34765A] font-semibold text-white transition-all duration-300 hover:bg-[#285C45]">
                       View Event
                       <ArrowRight
@@ -378,7 +402,9 @@ const UpcomingEventsPage = () => {
                   </Link>
 
                 </CardContent>
+
               </Card>
+
             ))}
 
           </div>
@@ -387,6 +413,7 @@ const UpcomingEventsPage = () => {
         {/* Bottom Message */}
         {filteredEvents.length > 0 && (
           <div className="mt-12 flex flex-col items-center justify-center gap-2 text-center">
+
             <div className="flex items-center gap-2 text-sm font-semibold text-[#34765A]">
               <Heart size={16} fill="currentColor" />
               Be the reason someone smiles today.
@@ -395,6 +422,7 @@ const UpcomingEventsPage = () => {
             <p className="text-xs text-[#718579]">
               Every small action can create a meaningful change.
             </p>
+
           </div>
         )}
 
